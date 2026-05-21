@@ -110,6 +110,16 @@ tr:hover td{background:rgba(200,144,64,.08)}
   <div class="loading"><div class="spin"></div><div>กำลังดึงข้อมูลจาก Google Sheet...</div></div>
 </div>
 <script>
+// Global error catcher — shows error instead of frozen spinner
+window.onerror=function(msg,src,line,col,err){
+  const el=document.getElementById('mainContent');
+  if(el)el.innerHTML='<div class="err">❌ JS Error (line '+line+'): '+msg+'<br><small>'+String(err&&err.stack||'').slice(0,300)+'</small></div>';
+  return false;
+};
+window.addEventListener('unhandledrejection',function(e){
+  const el=document.getElementById('mainContent');
+  if(el)el.innerHTML='<div class="err">❌ Async Error: '+(e.reason&&(e.reason.message||String(e.reason))||'unknown')+'</div>';
+});
 const FILE_ID='1sWd6IQl-5P65i4xTzsSqHOH77P5Zd1PIkzZdtQOteUg';
 const MCP_TOOL='mcp__c3f78f3d-59f1-4385-a5c9-a0b5e1585ea4__read_file_content';
 // ── Branch config: fully dynamic, auto-discovers from Google Sheet ────────
@@ -406,7 +416,7 @@ const barLbl={id:'barLbl',afterDatasetsDraw(ch){
     });
   });
 }};
-Chart.register(barLbl);
+try{Chart.register(barLbl);}catch(e){console.warn("Chart.js not ready:",e.message);}
 function updateChartColors(){Object.values(_charts).forEach(ch=>{try{Object.values(ch.options.scales||{}).forEach(s=>{if(s.ticks)s.ticks.color=tc();if(s.grid)s.grid.color=gc();});if(ch.options.plugins&&ch.options.plugins.legend)ch.options.plugins.legend.labels.color=tc();ch.update('none');}catch(e){}});}
 
 // ── render ────────────────────────────────────────────────────────────────
@@ -578,7 +588,18 @@ function render(data,curKey,prevKey){
     '</tr></tbody></table></div></div></div>'
   :'')+
 
-  '<div class="sec"><div class="st">⑨ Key Insights & Next Steps</div><div class="ag">'+
+  '<div class="sec"><div class="st">⑨ Monthly Trend — รายสาขา</div><div class="cg3">'+
+    '<div class="cc"><div class="ct">💰 ยอดขาย รายสาขา (฿)</div><div class="cw h220"><canvas id="chMSales"></canvas></div></div>'+
+    '<div class="cc"><div class="ct">📋 TC รายสาขา (บิล)</div><div class="cw h220"><canvas id="chMTC"></canvas></div></div>'+
+    '<div class="cc"><div class="ct">💵 TA รายสาขา (฿/บิล)</div><div class="cw h220"><canvas id="chMTA"></canvas></div></div>'+
+  '</div>'+
+  '<div class="st" style="margin-top:14px">ยอดรวมทุกสาขา</div><div class="cg3">'+
+    '<div class="cc"><div class="ct">💰 ยอดขาย รวมทุกสาขา (฿)</div><div class="cw h200"><canvas id="chMTotSales"></canvas></div></div>'+
+    '<div class="cc"><div class="ct">📋 TC รวมทุกสาขา (บิล)</div><div class="cw h200"><canvas id="chMTotTC"></canvas></div></div>'+
+    '<div class="cc"><div class="ct">💵 TA เฉลี่ยรวม (฿/บิล)</div><div class="cw h200"><canvas id="chMTotTA"></canvas></div></div>'+
+  '</div></div>'+
+
+  '<div class="sec"><div class="st">⑩ Key Insights & Next Steps</div><div class="ag">'+
     '<div class="ac"><h4>🏆 Performance Highlights</h4><ul class="il">'+
       '<li><span class="dot" style="background:'+BR_COL[top]+'"></span><b>'+BR_LBL[top]+'</b> Top — '+fB(bv(top).actual)+' ('+(bv(top).target>0?(bv(top).actual/bv(top).target*100).toFixed(0):'—')+'%)</li>'+
       '<li><span class="dot" style="background:'+BR_COL[bot]+'"></span><b>'+BR_LBL[bot]+'</b> ต้องพัฒนา — '+fB(bv(bot).actual)+' ('+(bv(bot).target>0?(bv(bot).actual/bv(bot).target*100).toFixed(0):'—')+'%)</li>'+
@@ -650,6 +671,63 @@ function render(data,curKey,prevKey){
     options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16}},
       plugins:{legend:{position:'bottom',labels:{color:tc(),font:{size:10},padding:7}},tooltip:{callbacks:{label:ctx=>'฿'+ctx.raw}}},
       scales:{x:{ticks:{color:tc(),font:{size:9}},grid:{color:gc()}},y:{ticks:{color:tc(),font:{size:9},callback:v=>'฿'+v},grid:{color:gc()}}}}});
+
+  // ── Monthly Trend Charts — bar, up to curKey only ────────────────────────
+  // Filter: only months <= currently selected tab (curKey)
+  const trendMons=months.filter(k=>k<=curKey).map(k=>{
+    const[y,m]=k.split('-').map(Number);
+    const mo=calcMon(data,k);
+    return{key:k,label:TH_MON[m],mon:m,yr:y,mo};
+  });
+  const tLbls=trendMons.map(t=>t.label+(months.length>6?" '"+String(t.yr).slice(2):''));
+  const bC2=BRANCHES.map(br=>BR_COL[br]);
+  const barGroupOpts=(yFmt)=>({
+    responsive:true,maintainAspectRatio:false,
+    layout:{padding:{top:16}},
+    plugins:{
+      legend:{position:'bottom',labels:{color:tc(),font:{size:9},padding:6,boxWidth:10}},
+      tooltip:{callbacks:{label:ctx=>BR_LBL[BRANCHES[ctx.datasetIndex]]+(yFmt==='฿'?': ฿'+Math.round(ctx.raw).toLocaleString():': '+ctx.raw.toLocaleString()+(yFmt==='tc'?' บิล':''))}}
+    },
+    scales:{
+      x:{ticks:{color:tc(),font:{size:9}},grid:{color:gc()}},
+      y:{ticks:{color:tc(),font:{size:9},callback:v=>yFmt==='฿'?'฿'+(v>=1000?Math.round(v/1000)+'k':v):v},grid:{color:gc()}}
+    }
+  });
+  mkChart('chMSales',{type:'bar',data:{labels:tLbls,datasets:BRANCHES.map((br,i)=>({
+    label:BR_LBL[br],
+    data:trendMons.map(t=>{const b=t.mo.branches[br];return b?Math.round(b.actual):0;}),
+    backgroundColor:bC2[i]+'CC',borderColor:bC2[i],borderWidth:1,borderRadius:3
+  }))},options:barGroupOpts('฿')});
+  mkChart('chMTC',{type:'bar',data:{labels:tLbls,datasets:BRANCHES.map((br,i)=>({
+    label:BR_LBL[br],
+    data:trendMons.map(t=>{const b=t.mo.branches[br];return b?b.tc:0;}),
+    backgroundColor:bC2[i]+'CC',borderColor:bC2[i],borderWidth:1,borderRadius:3
+  }))},options:barGroupOpts('tc')});
+  mkChart('chMTA',{type:'bar',data:{labels:tLbls,datasets:BRANCHES.map((br,i)=>({
+    label:BR_LBL[br],
+    data:trendMons.map(t=>{const b=t.mo.branches[br];return b&&b.tc>0?Math.round(b.actual/b.tc):0;}),
+    backgroundColor:bC2[i]+'CC',borderColor:bC2[i],borderWidth:1,borderRadius:3
+  }))},options:barGroupOpts('฿')});
+  // ── Monthly Trend: Total all branches ───────────────────────────────────
+  const totPal=['#C89040','#8B4513','#5B9BD5'];
+  const singleBarOpts=(yFmt,color)=>({
+    responsive:true,maintainAspectRatio:false,
+    layout:{padding:{top:18}},
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>yFmt==='฿'?'฿'+Math.round(ctx.raw).toLocaleString():ctx.raw.toLocaleString()+(yFmt==='tc'?' บิล':'')}}
+    },
+    scales:{
+      x:{ticks:{color:tc(),font:{size:9}},grid:{color:gc()}},
+      y:{ticks:{color:tc(),font:{size:9},callback:v=>yFmt==='฿'?'฿'+(v>=1000?Math.round(v/1000)+'k':v):v},grid:{color:gc()}}
+    }
+  });
+  const totSales=trendMons.map(t=>Math.round(Object.values(t.mo.branches).reduce((s,b)=>s+(b?b.actual:0),0)));
+  const totTC=trendMons.map(t=>Object.values(t.mo.branches).reduce((s,b)=>s+(b?b.tc:0),0));
+  const totTA=trendMons.map(t=>{const s=totSales[trendMons.indexOf(t)],tc2=totTC[trendMons.indexOf(t)];return tc2>0?Math.round(s/tc2):0;});
+  mkChart('chMTotSales',{type:'bar',data:{labels:tLbls,datasets:[{label:'ยอดขายรวม',data:totSales,backgroundColor:totPal[0]+'BB',borderColor:totPal[0],borderWidth:1,borderRadius:4}]},options:singleBarOpts('฿',totPal[0])});
+  mkChart('chMTotTC',{type:'bar',data:{labels:tLbls,datasets:[{label:'TC รวม',data:totTC,backgroundColor:totPal[1]+'BB',borderColor:totPal[1],borderWidth:1,borderRadius:4}]},options:singleBarOpts('tc',totPal[1])});
+  mkChart('chMTotTA',{type:'bar',data:{labels:tLbls,datasets:[{label:'TA เฉลี่ย',data:totTA,backgroundColor:totPal[2]+'BB',borderColor:totPal[2],borderWidth:1,borderRadius:4}]},options:singleBarOpts('฿',totPal[2])});
 }
 
 // ── Month Tabs ────────────────────────────────────────────────────────────
@@ -711,19 +789,14 @@ async function loadData(){
       }catch(e){if(e.message!=='cowork_timeout')console.warn('Cowork:',e.message);}
     }
 
-    // JSONP path — auto-discover sheets, then fetch each one dynamically
+    // JSONP path — fetch each known sheet + auto-discover new ones in background
     if(!txt){
       dataMode='direct';allData={};
-      // Auto-discover sheet tabs from Google Sheets API (no API key needed for public sheets)
-      const FALLBACK_SHEETS=['Home Pro Bangna','Home Pro Rangsit','Victory','Mono Park','Samyan Mitrtown','True Digital Park'];
-      setLoading('🔍 ค้นหา Sheet อัตโนมัติ...');
-      let discovered=await fetchSheetNames();
-      // Filter out non-branch sheets (summary/overview/template tabs)
-      const skipWords=['summary','overview','template','config','รวม','ภาพรวม'];
-      if(discovered&&discovered.length>0){
-        discovered=discovered.filter(n=>!skipWords.some(w=>n.toLowerCase().includes(w)));
-      }
-      const sheetNames=(discovered&&discovered.length>0)?discovered:FALLBACK_SHEETS;
+      // Primary list — always fetched. New branches added to Google Sheet are
+      // auto-discovered on next load via fetchSheetNames() running in background.
+      let sheetNames=['Home Pro Bangna','Home Pro Rangsit','Victory','Mono Park','Samyan Mitrtown','True Digital Park'];
+      // Kick off background discovery (non-blocking) — result merged after primary fetch
+      const discoveryPromise=fetchSheetNames().catch(()=>[]);
       // Fetch each sheet and register branch dynamically
       const steps=sheetNames.map(s=>'⏳ '+s);
       for(let i=0;i<sheetNames.length;i++){
@@ -747,6 +820,24 @@ async function loadData(){
         }
         setLoading('📡 Google Sheet ('+(i+1)+'/'+sheetNames.length+')',steps);
       }
+      // Merge any newly discovered sheets (not in primary list)
+      try{
+        const skipWords=['summary','overview','template','config','รวม','ภาพรวม'];
+        const discovered=(await discoveryPromise).filter(n=>
+          !skipWords.some(w=>n.toLowerCase().includes(w))&&
+          !sheetNames.some(s=>s.toLowerCase()===n.toLowerCase())
+        );
+        for(const extra of discovered){
+          try{
+            const d=await fetchGvizSheet(extra);
+            const bk=normBrKey(extra);
+            regBranch(bk,extra);
+            if(!allData[bk])allData[bk]={};
+            const p=parseGvizDirect(d,bk);
+            Object.assign(allData[bk],(p[bk]||{}));
+          }catch(e){console.warn('Extra sheet',extra,e.message);}
+        }
+      }catch(e){}
       // Compute BRANCHES from what actually returned data
       BRANCHES=Object.keys(allData).filter(b=>Object.keys(allData[b]||{}).length>0);
       const mSet=new Set();BRANCHES.forEach(b=>Object.keys(allData[b]||{}).forEach(k=>mSet.add(k)));
@@ -782,5 +873,15 @@ async function loadData(){
     document.getElementById('mainContent').innerHTML='<div class="err">❌ โหลดข้อมูลไม่ได้: '+e.message+'</div>';
   }
 }
-loadData();
+loadData().catch(function(e){
+  const el=document.getElementById('mainContent');
+  if(el)el.innerHTML='<div class="err">❌ loadData failed: '+e.message+'</div>';
+});
+// Fallback: if nothing rendered after 40s, show timeout error
+setTimeout(function(){
+  const el=document.getElementById('mainContent');
+  if(el&&el.querySelector('.loading')){
+    el.innerHTML='<div class="err">⏱ Timeout: ไม่สามารถโหลดข้อมูลได้<br>กรุณาตรวจสอบ Internet และ Google Sheet เป็น Public<br><a href="https://docs.google.com/spreadsheets/d/1sWd6IQl-5P65i4xTzsSqHOH77P5Zd1PIkzZdtQOteUg" target="_blank">🔗 เปิด Google Sheet</a></div>';
+  }
+},40000);
 </script></body></html>
