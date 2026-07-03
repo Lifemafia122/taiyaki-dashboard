@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Croissant Taiyaki Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
+<style>
+:root{--bg:#181208;--bg2:#221a08;--bg3:#2e2210;--border:#3e2e14;--t1:#f2e4c4;--t2:#c8a258;--t3:#806830;--gold:#e0a830;--gold2:#c07828;--green:#3ec870;--red:#e85858;--blue:#48a8d0;--purple:#a07cc0;--card:#221a08}
+[data-theme=light]{--bg:#fdf6e4;--bg2:#fffbee;--bg3:#f4e8c0;--border:#d8c080;--t1:#1a1005;--t2:#5a3808;--t3:#907830;--gold:#9a6800;--gold2:#a04808;--green:#157040;--red:#b82020;--blue:#1058a0;--purple:#604898;--card:#fffbee}
+*{box-sizing:border-box;margin:0;padding:0}html{font-size:15px}
+body{background:var(--bg);color:var(--t1);font-family:"Segoe UI",-apple-system,sans-serif;min-height:100vh;line-height:1.6}
+.topbar{background:var(--bg2);border-bottom:2px solid var(--gold);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300;gap:8px;flex-wrap:wrap}
+.logo{font-size:1.08rem;font-weight:800;color:var(--gold)}.logo em{color:var(--gold2);font-style:normal}
+.topbar-r{display:flex;align-items:center;gap:10px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.btn{border:none;border-radius:7px;padding:5px 13px;cursor:pointer;font-size:.82rem;font-weight:700}
+.btn-p{background:var(--gold);color:#181208}.btn-s{background:var(--bg3);border:1px solid var(--border);color:var(--t2)}
+.lupd{font-size:.72rem;color:var(--t3)}
+.mnav{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;scrollbar-width:none;position:sticky;top:46px;z-index:290}
+.mnav::-webkit-scrollbar{display:none}
+.mnb{padding:10px 18px;border:none;border-bottom:3px solid transparent;background:none;color:var(--t2);cursor:pointer;white-space:nowrap;font-size:.86rem;font-weight:700}
+.mnb:hover{color:var(--t1);background:var(--bg3)}.mnb.on{color:var(--gold);border-bottom-color:var(--gold)}
+.tc{display:none}.tc.on{display:block}
+.con{padding:16px 18px;max-width:1600px;margin:0 auto}
+.snwrap{background:var(--bg);padding:10px 0 4px;position:sticky;top:90px;z-index:200}
+.snav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.snb{padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--t2);cursor:pointer;font-size:.8rem;font-weight:700}
+.snb:hover{border-color:var(--gold);color:var(--gold)}.snb.on{background:var(--gold);border-color:var(--gold);color:#181208}
+.sc{display:none}.sc.on{display:block}
+.hero{background:linear-gradient(135deg,#8a5e14 0%,#5a3608 100%);border-radius:13px;padding:18px 22px;margin-bottom:16px;color:#fdf0d0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.hero .up{color:#88ffaa!important;font-weight:700}.hero .dn{color:#ffaaaa!important;font-weight:700}.hero .fl{color:rgba(255,240,200,.5)!important}
+.hero-l .hl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;opacity:.75;margin-bottom:4px}
+.hero-l .hv{font-size:2rem;font-weight:900;line-height:1.1}
+.hero-l .hs{font-size:.82rem;opacity:.85;margin-top:5px;line-height:1.7}
+.hero-stats{display:flex;gap:18px;flex-wrap:wrap}
+.hsi .sv{font-size:1.05rem;font-weight:800}.hsi .sl{font-size:.66rem;opacity:.68;text-transform:uppercase;letter-spacing:.04em;margin-top:2px;text-align:center}
+.prorate{background:rgba(224,168,48,.1);border:1px solid rgba(224,168,48,.3);border-radius:10px;padding:13px 16px;margin-bottom:14px}
+.prorate-title{font-size:.8rem;font-weight:700;color:var(--gold);margin-bottom:10px}
+.prorate-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:9px}
+.pi{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.pi .pl{font-size:.67rem;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.pi .pv{font-size:1.05rem;font-weight:800;color:var(--t1)}.pi .pd{font-size:.72rem;margin-top:3px;font-weight:600}
+.kg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.kc{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:13px;position:relative;overflow:hidden}
+.kc::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold)}
+.cg::before{background:var(--green)}.cr::before{background:var(--red)}.cy::before{background:var(--gold)}.cb::before{background:var(--blue)}.cp::before{background:var(--gold2)}
+.kl{font-size:.66rem;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.kv{font-size:1.18rem;font-weight:800;line-height:1.2;color:var(--t1)}.ks{font-size:.71rem;color:var(--t3);margin-top:3px}.kd{font-size:.72rem;font-weight:700;margin-top:4px}
+.tg{color:var(--green)!important}.tr{color:var(--red)!important}.ty{color:var(--gold)!important}.tb{color:var(--blue)!important}.tp{color:var(--gold2)!important}
+.up{color:var(--green);font-weight:700}.dn{color:var(--red);font-weight:700}.fl{color:var(--t3)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px;margin-bottom:14px}
+.ct{font-size:.88rem;font-weight:700;margin-bottom:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--t1)}
+.bdg{font-size:.67rem;padding:2px 8px;border-radius:10px;background:var(--bg3);color:var(--t3);font-weight:700}
+.bdg-y{background:rgba(224,168,48,.15);color:var(--gold);border:1px solid rgba(224,168,48,.3)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+th{background:var(--bg3);color:var(--t2);padding:9px 10px;text-align:right;font-weight:700;border-bottom:2px solid var(--border);white-space:nowrap;font-size:.76rem;vertical-align:middle}
+th.tl{text-align:left}
+td{padding:8px 10px;border-bottom:1px solid var(--bg3);text-align:right;color:var(--t1);font-size:.8rem;vertical-align:middle}
+td.tl{text-align:left;color:var(--t2);font-weight:600}
+tr:hover td{background:var(--bg3)}
+tr.tot td{background:rgba(224,168,48,.08);font-weight:800;border-top:2px solid var(--border);color:var(--t1)}
+tr.shdr td{background:var(--bg3);font-weight:700;color:var(--gold);text-align:left!important;font-size:.72rem;text-transform:uppercase;padding:5px 10px}
+tr.wr td{background:rgba(72,168,208,.06);font-size:.78rem}
+tr.wr td.tl{color:var(--blue);font-weight:700}
+.cw{position:relative;height:220px}.cw-lg{position:relative;height:270px}@media(max-width:900px){.cw{height:180px}.cw-lg{height:220px}}.cw canvas,.cw-lg canvas{max-width:100%!important}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+@media(max-width:720px){.g2{grid-template-columns:1fr}.kg{grid-template-columns:repeat(2,1fr)}.hero-stats{gap:12px}}
+.loading{text-align:center;padding:70px;color:var(--t3)}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stitle{font-size:.74rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.info-box{background:rgba(224,168,48,.08);border:1px solid rgba(224,168,48,.22);border-radius:9px;padding:11px 15px;font-size:.8rem;color:var(--gold);margin-bottom:14px;line-height:1.5}
+.warn-box{background:rgba(232,88,88,.08);border:1px solid rgba(232,88,88,.22);border-radius:9px;padding:11px 15px;font-size:.8rem;color:var(--red);margin-bottom:14px}
+.prog-wrap{background:var(--bg3);border-radius:4px;height:6px;overflow:hidden;margin-top:3px}.prog-bar{height:100%;border-radius:4px}
+.pnl-p{color:var(--green)!important;font-weight:800}.pnl-n{color:var(--red)!important;font-weight:800}
+.alcard{border-radius:10px;padding:12px 15px;margin-bottom:9px;display:flex;align-items:flex-start;gap:11px}
+.alcard.danger{background:rgba(232,88,88,.09);border:1px solid rgba(232,88,88,.25)}
+.alcard.warn{background:rgba(224,168,48,.08);border:1px solid rgba(224,168,48,.22)}
+.alcard.good{background:rgba(62,200,112,.08);border:1px solid rgba(62,200,112,.22)}
+.alcard.info{background:rgba(72,168,208,.08);border:1px solid rgba(72,168,208,.22)}
+.al-t{font-size:.84rem;font-weight:700;margin-bottom:3px}.al-b{font-size:.78rem;color:var(--t2);line-height:1.5}
+.alcard.danger .al-t{color:var(--red)}.alcard.warn .al-t{color:var(--gold)}.alcard.good .al-t{color:var(--green)}.alcard.info .al-t{color:var(--blue)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">&#x1F41F; Croissant <em>Taiyaki</em> Dashboard</div>
+  <div class="topbar-r">
+    <span class="dot" id="dot"></span>
+    <span class="lupd" id="lupd">Loading...</span>
+    <button class="btn btn-p" onclick="loadData()">&#8635; Refresh</button>
+    <button class="btn btn-s" onclick="toggleTheme()">&#9728; / &#127769;</button>
+  </div>
+</div>
+<nav class="mnav">
+  <button class="mnb on" onclick="showTab(this,'tab-sum')">&#x1F4CA; Summary</button>
+  <button class="mnb" onclick="showTab(this,'tab-br')">&#x1F3EA; สาขา</button>
+  <button class="mnb" onclick="showTab(this,'tab-pnl')">&#x1F4B0; P&amp;L</button>
+  <button class="mnb" onclick="showTab(this,'tab-alert')">&#x1F514; วิเคราะห์</button>
+</nav>
+<div class="tc on" id="tab-sum"><div class="con"><div class="loading" id="sum-load"><div class="spinner"></div>Loading...</div><div id="sum-body" style="display:none"></div></div></div>
+<div class="tc" id="tab-br"><div class="con"><div class="loading" id="br-load"><div class="spinner"></div>Loading...</div><div id="br-body" style="display:none"></div></div></div>
+<div class="tc" id="tab-pnl"><div class="con"><div class="loading" id="pnl-load"><div class="spinner"></div>Loading...</div><div id="pnl-body" style="display:none"></div></div></div>
+<div class="tc" id="tab-alert"><div class="con"><div class="loading" id="alert-load"><div class="spinner"></div>Loading...</div><div id="alert-body" style="display:none"></div></div></div>
+<script>
+
+const SALES_ID='1zLHLQahiCPiFKWjdCnJwGjm6fJ-3yDwZvkgJ6_TJ32o';
+const EXP_ID='1CTyQv_9pJAZczJW4E7mh4UtOIxDLo2ddgPavx0RBZcc';
+const MON_TH=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const MON_EN=['','January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAY_TGT=15000;
+// ชื่อ tab ใน Google Sheet — เพิ่มที่นี่เมื่อเปิดสาขาใหม่
+const BRANCH_TABS=['Home Pro Bangna','Home Pro Rangsit','Victory','Mono Park','True Digital Park','Samyan Mitrtown','Secon Srinakarin'];
+function branchToTab(name){
+  const n=(name||'').toLowerCase();
+  for(const t of BRANCH_TABS){if(t.toLowerCase()===n)return t;}
+  const kw={'bangna':'Home Pro Bangna','บางนา':'Home Pro Bangna',
+    'rangsit':'Home Pro Rangsit','รังสิต':'Home Pro Rangsit',
+    'victory':'Victory','mono':'Mono Park',
+    'true digital':'True Digital Park','truedigital':'True Digital Park',
+    'samyan':'Samyan Mitrtown','secon':'Secon Srinakarin',
+    'srinakarin':'Secon Srinakarin','ศรีนครินทร์':'Secon Srinakarin','สีนครินทร์':'Secon Srinakarin'};
+  for(const[k,v]of Object.entries(kw)){if(n.indexOf(k)>=0)return v;}
+  return name;
+}
+let allMonths=[],expenses=[],charts={};
+// คำนวณวันทำการจาก target (วันที่ร้านเปิด ไม่นับวันหยุด)
+// brAvg = avgDay จาก Sheet ตรงๆ (Sheet คำนวณ actual÷วันทำการไว้แล้ว)
+function brOpDays(b){return b.avgDay>0&&b.actual>0?Math.max(1,Math.round(b.actual/b.avgDay)):1;}
+function brAvg(b){return b.avgDay||0;}
+function brDayTgt(b){var d=(b.opDays&&b.opDays>0)?b.opDays:brOpDays(b);return b.target&&d>0?Math.round(b.target/d):DAY_TGT;}
+function totOpDays(m){var mx=0;for(var i=0;i<m.branches.length;i++){var b=m.branches[i];if(b.opDays&&b.opDays>mx)mx=b.opDays;}if(mx>0)return mx;for(var i=0;i<m.branches.length;i++){var b=m.branches[i];if(b.avgDay>0&&b.actual>0)return Math.max(1,Math.round(b.actual/b.avgDay));}return m.days||1;}
+function totActDays(m){var mx=0;for(var i=0;i<m.branches.length;i++){var b=m.branches[i];if(b.actDays&&b.actDays>mx)mx=b.actDays;}return mx;}
+function totAvg(m){var d=totActDays(m)||totOpDays(m);return d>0?m.total.actual/d:0;}
+function totDayTgt(m){var d=totOpDays(m);return m.total&&m.total.target&&d>0?Math.round(m.total.target/d):DAY_TGT;}
+function brAvgFull(b){if(b.actDays&&b.actDays>0)return b.actual/b.actDays;if(b.opDays&&b.opDays>0)return b.actual/b.opDays;return brAvg(b);}
+
+function fetchGviz(id, sheetName){
+  return new Promise((res,rej)=>{
+    const cb='gviz_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    const el=document.createElement('script');
+    const t=setTimeout(()=>{cleanup();rej(new Error('Timeout'));},20000);
+    function cleanup(){clearTimeout(t);delete window[cb];el.parentNode&&el.parentNode.removeChild(el);}
+    window[cb]=d=>{cleanup();if(d&&d.status==='error')rej(new Error('Sheet not found'));else res(d);};
+    el.onerror=()=>{cleanup();rej(new Error('โหลด Sheet ไม่ได้ — ตรวจสอบ "Anyone with link can view"'));};
+    const sheetParam=sheetName?'&sheet='+encodeURIComponent(sheetName):'';
+    el.src='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=responseHandler:'+cb+sheetParam;
+    document.head.appendChild(el);
+  });
+}
+
+function gvizRows(d){
+  if(!d||!d.table)return[];
+  return(d.table.rows||[]).map(r=>(r.c||[]).map(c=>(!c||c.v==null)?'':(c.f!=null?String(c.f):String(c.v))));
+}
+
+function pn(s){
+  s=String(s||'').replace(/,/g,'').replace(/฿/g,'').trim();
+  if(!s||s==='#DIV/0!'||s==='-'||s==='Infinity'||s==='#N/A'||s==='#VALUE!')return 0;
+  return parseFloat(s)||0;
+}
+
+function parseSales(rows){
+  const months=[];let cur=null;
+  for(const c of rows){
+    const c1=(c[1]||'').trim();
+    if(c1.indexOf('Sale Performance')===0){
+      const pts=c1.split(' ');
+      const mi=MON_EN.indexOf(pts[2]);const yr=parseInt(pts[3])||2026;
+      const days=pn(c[c.length-1])||pn(c[20]);
+      cur={monthIdx:mi,year:yr,monthName:pts[2],monthTH:MON_TH[mi],days,branches:[]};
+      months.push(cur);continue;
+    }
+    if(!cur||c1.indexOf('Branch')>=0)continue;
+    if(!c1&&pn(c[3])>0){cur.total=r2o(c,true);continue;}
+    if(!c1)continue;
+    if(c1.indexOf('Sale')!==0){const b=r2o(c,false);b.name=c1.replace('ฺ','').trim();if(b.actual>0||b.target>0)cur.branches.push(b);}
+  }
+  months.forEach(m=>{if(!m.total&&m.branches.length)m.total=agg(m.branches);});
+  return months.filter(m=>m.branches.length>0);
+}
+
+function r2o(c,isTotal){
+  const actual=pn(c[3]),delivery=pn(c[10]),grab=pn(c[13]),lineman=pn(c[16]);
+  const tcInStore=pn(c[8]),tcDel=pn(c[11]),tcGrab=pn(c[14]),tcLine=pn(c[17]);
+  let inStore=pn(c[7]);
+  if(!isTotal&&inStore>actual)inStore=Math.max(0,actual-delivery);
+  const tc=pn(c[5]),ta=tc?actual/tc:pn(c[6]);
+  return{target:pn(c[2]),actual,tc,ta,
+    inStore,tcInStore,taInStore:tcInStore?inStore/tcInStore:0,
+    delivery,tcDel,taDel:tcDel?delivery/tcDel:0,
+    grab,tcGrab,taGrab:tcGrab?grab/tcGrab:0,
+    lineman,tcLine,taLine:tcLine?lineman/tcLine:0,
+    avgDay:pn(c[20])};
+}
+
+function agg(brs){
+  const s=f=>brs.reduce((a,b)=>a+(b[f]||0),0);
+  const t={target:s('target'),actual:s('actual'),tc:s('tc'),inStore:s('inStore'),tcInStore:s('tcInStore'),
+    delivery:s('delivery'),tcDel:s('tcDel'),grab:s('grab'),tcGrab:s('tcGrab'),lineman:s('lineman'),tcLine:s('tcLine')};
+  t.pct=t.target?t.actual/t.target*100:0;t.ta=t.tc?t.actual/t.tc:0;
+  t.taInStore=t.tcInStore?t.inStore/t.tcInStore:0;t.taDel=t.tcDel?t.delivery/t.tcDel:0;
+  t.taGrab=t.tcGrab?t.grab/t.tcGrab:0;t.taLine=t.tcLine?t.lineman/t.tcLine:0;
+  return t;
+}
+
+function parseDailyOps(rows){
+  // opMap    = วันที่ target > 0 (ใช้คำนวณ เป้า/วัน)
+  // actMap   = วันที่ actual > 0 (ใช้คำนวณ AVG/วัน)
+  // dailyMap = ข้อมูลรายวัน [{n:วันที่, t:target, a:actual}] ต่อเดือน (ใช้ Trend chart)
+  const opMap={},actMap={},dailyMap={};
+  let dateCol=1,tgtCol=2;
+  let firstMi=-1,firstYr=2026;
+  for(var _i=0;_i<rows.length;_i++){
+    var _c=rows[_i];
+    var hdr='';
+    var _c0=(_c[0]||'').trim(),_c1=(_c[1]||'').trim();
+    if(_c0.indexOf('Sale Performance')===0){dateCol=0;tgtCol=1;hdr=_c0;}
+    else if(_c1.indexOf('Sale Performance')===0){dateCol=1;tgtCol=2;hdr=_c1;}
+    if(hdr){
+      var pts=hdr.split(' ');
+      firstMi=MON_EN.indexOf(pts[pts.length-2]);
+      firstYr=parseInt(pts[pts.length-1])||2026;
+      break;
+    }
+  }
+  // Strategy 2: gviz ไม่ส่ง header row — ตรวจ firstMi จาก date value (d/m/yyyy)
+  if(firstMi<1){
+    for(var _dc=0;_dc<=1&&firstMi<1;_dc++){
+      for(var _i2=0;_i2<rows.length&&firstMi<1;_i2++){
+        var _dv=(rows[_i2][_dc]||'').trim();
+        if(!_dv)continue;
+        var _m=_dv.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if(_m){
+          var _mo=parseInt(_m[2]),_yr2=parseInt(_m[3]);
+          if(_mo>=1&&_mo<=12&&_yr2>=2020&&_yr2<=2030){
+            firstMi=_mo;firstYr=_yr2;dateCol=_dc;tgtCol=_dc+1;
+          }
+        }
+      }
+    }
+  }
+  if(firstMi<1)return{opMap,actMap};
+  var secIdx=0,cur=[];
+  var actCol=tgtCol+1;
+  function flush(){
+    if(!cur.length)return;
+    var mi=firstMi+secIdx,yr=firstYr+Math.floor((mi-1)/12);
+    mi=((mi-1)%12)+1;
+    var cnt=0,actCnt=0,days=[];
+    for(var j=0;j<cur.length;j++){
+      var tgt=pn(cur[j][tgtCol]),act=pn(cur[j][actCol]);
+      if(tgt>0)cnt++;
+      if(act>0)actCnt++;
+      var dstr=(cur[j][dateCol]||'').trim();
+      var dm=dstr.match(/^(\d{1,2})\//);
+      var dayNum=dm?parseInt(dm[1]):0;
+      if(dayNum>0)days.push({n:dayNum,t:tgt,a:act});
+    }
+    var mk2=mi+'_'+yr;
+    if(cnt>0)opMap[mk2]=cnt;
+    if(actCnt>0)actMap[mk2]=actCnt;
+    if(days.length)dailyMap[mk2]=days;
+    secIdx++;cur=[];
+  }
+  for(var i=0;i<rows.length;i++){
+    var c=rows[i];
+    if((c[0]||'').indexOf('Sale Performance')===0||(c[1]||'').indexOf('Sale Performance')===0)continue;
+    var dv=(c[dateCol]||'').trim();
+    if(!dv){flush();continue;}
+    cur.push(c);
+  }
+  flush();
+  return{opMap,actMap,dailyMap};
+}
+
+function parseExpense(rows, fallbackMonth){
+  const items=[];let month=fallbackMonth||'';
+  for(const c of rows){
+    const c1=(c[1]||'').trim();
+    const det=(c[3]||'').trim();
+    // skip แถวที่ c[1] และ c[3] ว่างพร้อมกัน (แถวว่าง / แถว Total)
+    if(!c1&&!det)continue;
+    if(/\d{4}/.test(c1)&&c.filter(x=>x).length<=4){month=c1;continue;}
+    if(c1==='No.'||c1==='No')continue;
+    const cost=pn(c[6])||pn(c[5]);
+    if(cost>0)items.push({month,date:(c[2]||'').trim(),detail:det,category:(c[4]||'').trim(),supplier:(c[5]||'').trim(),cost});
+  }
+  return items;
+}
+
+const fmt=n=>n?'฿'+Math.round(n).toLocaleString('th-TH'):'฿0';
+const fmtE=n=>n!=null&&n!==0?'฿'+n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}):'฿0.00';
+const fmtN=n=>Math.round(n).toLocaleString('th-TH');
+const fmtP=n=>(n||0).toFixed(1)+'%';
+const dlt=(a,b)=>(!b||b===0)?null:(a-b)/Math.abs(b)*100;
+function dH(d){if(d===null||d===undefined||isNaN(d))return'<span class="fl">—</span>';return`<span class="${d>=0?'up':'dn'}">${d>=0?'▲':'▼'}${Math.abs(d).toFixed(1)}%</span>`;}
+const acls=p=>p>=100?'tg':p>=80?'ty':'tr';
+const akcls=p=>p>=100?'cg':p>=80?'cy':'cr';
+const tcF=tc=>tc>0?fmtN(tc):'—';
+const taF=(tc,ta)=>tc>0?fmt(ta):'—';
+
+function momD(cur,prev){if(!prev||!cur)return null;return dlt(totAvg(cur),totAvg(prev));}
+function momDBr(b,m,pb,pm){if(!pm||!m||!pb)return null;return dlt(brAvgFull(b),brAvgFull(pb));}
+function partLabel(m){const now=new Date();if(m.year===now.getFullYear()&&m.monthIdx===(now.getMonth()+1))return' <span style="font-size:.68rem;color:var(--blue);">('+now.getDate()+'วัน/'+m.days+'วัน)</span>';return'';}
+
+function proRate(m,b){
+  const now=new Date(),isCur=m.year===now.getFullYear()&&m.monthIdx===(now.getMonth()+1);
+  const dim=m.days||new Date(m.year,m.monthIdx,0).getDate();
+  const elapsed=isCur?Math.min(now.getDate(),dim):dim;
+  const daysLeft=dim-elapsed;
+  const target=b?b.target:m.total.target,actual=b?b.actual:m.total.actual;
+  const pTarget=target/dim*elapsed,pAch=pTarget?actual/pTarget*100:0;
+  const fullAch=target?actual/target*100:0,remaining=target-actual;
+  const needed=daysLeft>0?remaining/daysLeft:0;
+  return{isCur,elapsed,dim,daysLeft,pTarget,pAch,fullAch,remaining,needed};
+}
+
+function wow(fld,cur,prev){const we=cur.days?(cur.total[fld]||0)/cur.days*7:0;const pe=prev&&prev.days?(prev.total[fld]||0)/prev.days*7:null;return{we,pe,d:dlt(we,pe)};}
+function wowBr(fld,b,m,pb,pm){const we=m.days?(b[fld]||0)/m.days*7:0;const pe=pm&&pm.days?(pb&&pb[fld]||0)/pm.days*7:null;return{we,pe,d:dlt(we,pe)};}
+
+// WoW period labels — show exactly which days are being compared
+function wowLabel(m,prev){
+  const now=new Date();
+  const isCur=m.year===now.getFullYear()&&m.monthIdx===(now.getMonth()+1);
+  // Current period: actual elapsed days of this month
+  const elapsed=isCur?Math.min(now.getDate(),m.days):m.days;
+  const curLabel=isCur
+    ? `${m.monthTH} ${m.year}: 1–${elapsed} ${m.monthTH} (${elapsed} วัน) → AVG/สัปดาห์ = <strong>${fmt(m.total.actual/elapsed*7)}</strong>`
+    : `${m.monthTH} ${m.year}: ทั้งเดือน (${m.days} วัน) → AVG/สัปดาห์ = <strong>${fmt(m.total.actual/m.days*7)}</strong>`;
+  // Previous period: full month
+  const prevLabel=prev
+    ? `${prev.monthTH} ${prev.year}: ทั้งเดือน (${prev.days} วัน) → AVG/สัปดาห์ = <strong>${fmt(prev.total.actual/prev.days*7)}</strong>`
+    : null;
+  return{curLabel,prevLabel,elapsed};
+}
+function wowBrLabel(b,m,pb,pm){
+  const now=new Date();
+  const isCur=m.year===now.getFullYear()&&m.monthIdx===(now.getMonth()+1);
+  const elapsed=isCur?Math.min(now.getDate(),m.days):m.days;
+  const curLabel=isCur
+    ? `1–${elapsed} ${m.monthTH} (${elapsed} วัน) → ${fmt(b.actual/elapsed*7)}/สัปดาห์`
+    : `ทั้งเดือน ${m.monthTH} (${m.days} วัน) → ${fmt(b.actual/m.days*7)}/สัปดาห์`;
+  const prevLabel=pm&&pb
+    ? `ทั้งเดือน ${pm.monthTH} (${pm.days} วัน) → ${fmt(pb.actual/pm.days*7)}/สัปดาห์`
+    : null;
+  return{curLabel,prevLabel,elapsed};
+}
+
+function kcard(l,v,s,d,cls){return`<div class="kc ${cls||''}"><div class="kl">${l}</div><div class="kv">${v}</div><div class="ks">${s}</div>${d?`<div class="kd">${d}</div>`:''}</div>`;}
+
+async function loadData(){
+  setS('gold','กำลังโหลด...');
+  try{
+    // Sales: อ่านจาก tab "Summary Month" โดยตรง
+    const sd=await fetchGviz(SALES_ID,'Summary Month');
+    allMonths=parseSales(gvizRows(sd));
+
+    // ── Branch daily tabs: opDays = วันที่มียอดขายจริง > 0 ต่อสาขา ต่อเดือน ──
+    // fetch จาก BRANCH_TABS โดยตรง (ชื่อ tab ใน Sheet) ไม่ใช้ b.name
+    const _tabFetches=BRANCH_TABS.map(function(tn){
+      return fetchGviz(SALES_ID,tn).then(function(d){
+        const rows=gvizRows(d);
+        if(!rows.length)return{n:tn,ops:{},acts:{},days:{}};
+        const h0=(rows[0][0]||'').trim(),h1=(rows[0][1]||'').trim();
+        const hdr=h0.indexOf('Sale Performance')===0?h0:h1.indexOf('Sale Performance')===0?h1:'';
+        if(hdr){const pts=hdr.split(' ');if(MON_EN.indexOf(pts[2])>0)return{n:tn,ops:{},acts:{},days:{}};}
+        const{opMap,actMap,dailyMap}=parseDailyOps(rows);
+        return{n:tn,ops:opMap,acts:actMap,days:dailyMap};
+      }).catch(function(){return{n:tn,ops:{},acts:{},days:{}};});
+    });
+    const _tabRes=await Promise.allSettled(_tabFetches);
+    const _tabOps={},_tabActs={},_tabDays={};
+    for(const r of _tabRes){if(r.status==='fulfilled'&&r.value){_tabOps[r.value.n]=r.value.ops;_tabActs[r.value.n]=r.value.acts;_tabDays[r.value.n]=r.value.days;}}
+    // เซ็ต b.opDays, b.actDays, b.dailyData ต่อสาขา
+    allMonths.forEach(function(m){
+      const mk=m.monthIdx+'_'+m.year;
+      m.branches.forEach(function(b){
+        const tn=branchToTab(b.name);
+        const bops=_tabOps[tn],bacts=_tabActs[tn],bdays=_tabDays[tn];
+        if(bops&&bops[mk]>0)b.opDays=bops[mk];
+        if(bacts&&bacts[mk]>0)b.actDays=bacts[mk];
+        if(bdays)b.dailyData=bdays; // {monthKey: [{n,t,a}]} — ทุกเดือนของ branch นี้
+      });
+    });
+
+    // ─── Fallback: estimate opDays จาก Summary Month target/days ratio ────────────
+    // ถ้า daily tab fetch สำเร็จ (b.opDays set แล้ว) → ข้าม
+    // ถ้าไม่ → ใช้ refRate 2 ระดับ:
+    //   brRefRate  = rate สูงสุดของ branch นี้ เดือนที่ดูเป็น full (ใช้ถ้า brRef ≥ 70% ของ monRef)
+    //   monRefRate = rate สูงสุดของทุก branch ในเดือนเดียวกัน (anchor จาก branch ที่เปิดเต็มเดือน)
+    // → รองรับ branch เพิ่งเปิด (เดือนแรกเป็น partial, ยังไม่มี brRef ที่เชื่อถือได้)
+    {
+      const _brRefRate={}, _monRefRate={};
+      allMonths.forEach(function(m){
+        if(!m.days)return;
+        const mk=m.monthIdx+'_'+m.year;
+        m.branches.forEach(function(b){
+          if(!b.target)return;
+          const rate=(b.opDays&&b.opDays>0)?b.target/b.opDays:b.target/m.days;
+          if(!_brRefRate[b.name]||rate>_brRefRate[b.name])_brRefRate[b.name]=rate;
+          if(!_monRefRate[mk]||rate>_monRefRate[mk])_monRefRate[mk]=rate;
+        });
+      });
+      allMonths.forEach(function(m){
+        if(!m.days)return;
+        const mk=m.monthIdx+'_'+m.year;
+        m.branches.forEach(function(b){
+          if(b.opDays)return;
+          if(!b.target||!b.actual)return;
+          const brRef=_brRefRate[b.name]||0;
+          const monRef=_monRefRate[mk]||0;
+          // ถ้า brRef สูงพอ (≥70% ของ monRef) → เชื่อ brRef (เฉพาะ branch)
+          // ถ้า brRef ต่ำมาก → branch นี้เพิ่งเปิด/เดือนแรกเป็น partial → ใช้ monRef จาก branch อื่น
+          const ref=(brRef>=monRef*0.7)?brRef:monRef;
+          if(!ref)return;
+          const rate=b.target/m.days;
+          if(rate<ref*0.7){
+            const op=Math.max(1,Math.round(b.target/ref));
+            if(op<m.days)b.opDays=op;
+          }
+        });
+      });
+      // ─── Debug: แสดงผล opDays ทุกสาขาทุกเดือนใน Console ────────────────────────
+      console.group('[Taiyaki] opDays debug — เชคว่านับวันถูกไหม');
+      console.log('brRefRate:', Object.fromEntries(Object.entries(_brRefRate).map(([k,v])=>[k,Math.round(v)])));
+      console.log('monRefRate:', Object.fromEntries(Object.entries(_monRefRate).map(([k,v])=>[k,Math.round(v)])));
+      allMonths.forEach(function(m){
+        const rows=m.branches.map(function(b){
+          return{branch:b.name,opDays:b.opDays||'(ไม่มี→calDays='+m.days+')',target:b.target,actual:b.actual,
+            avgOp:b.opDays?Math.round(b.actual/b.opDays):Math.round(b.avgDay)};
+        });
+        console.log(m.monthTH+' '+m.year+' (calDays='+m.days+')', rows);
+      });
+      console.groupEnd();
+    }
+
+    // Expenses: fetch เฉพาะเดือนที่อยู่ใน allMonths + เดือนปัจจุบัน พร้อม date validation กัน fallback data
+    const MUPPR=['','JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+    const MTTL=['','January','February','March','April','May','June','July','August','September','October','November','December'];
+    const now=new Date();
+    const expFetches=[];
+    const seenMY=new Set();
+    const monthsToTry=[];
+    allMonths.forEach(function(m){const k=m.monthIdx+'_'+m.year;if(!seenMY.has(k)){seenMY.add(k);monthsToTry.push({mi:m.monthIdx,yr:m.year});}});
+    const curMi=now.getMonth()+1,curYr=now.getFullYear(),curK=curMi+'_'+curYr;
+    if(!seenMY.has(curK))monthsToTry.push({mi:curMi,yr:curYr});
+    for(const {mi,yr} of monthsToTry){
+      const mu=MUPPR[mi]+' '+yr, mt=MTTL[mi]+' '+yr;
+      const expMon=String(mi).padStart(2,'0');
+      [mu,mt,mt+'.',mt+'..',mt+'...'].forEach(function(name){
+        const cn=name.replace(/\.+$/,'').trim();
+        expFetches.push(
+          fetchGviz(EXP_ID,name).then(function(d){
+            const items=parseExpense(gvizRows(d),cn);
+            if(!items.length)return[];
+            // date validation: ถ้า majority item ไม่ match เดือนที่คาดหวัง = fallback data → ทิ้ง
+            const dated=items.filter(function(e){return e.date&&e.date.split('-').length>=2;});
+            if(dated.length>0){
+              const ok=dated.filter(function(e){return e.date.split('-')[1]===expMon;}).length;
+              if(ok/dated.length<0.5)return[];
+            }
+            return items;
+          }).catch(function(){return[];})
+        );
+      });
+    }
+    const expResults=await Promise.allSettled(expFetches);
+    const seenK=new Set();expenses=[];
+    for(const r of expResults){
+      if(r.status==='fulfilled'){
+        for(const item of r.value){
+          // normalize month to lowercase for dedup key → ป้องกัน "MAY 2026" กับ "May 2026" นับซ้ำ
+          const normM=item.month.toLowerCase().replace(/\.+$/,'').trim();
+          const k=`${normM}|${item.date}|${item.detail}|${item.cost}`;
+          if(!seenK.has(k)){seenK.add(k);expenses.push(item);}
+        }
+      }
+    }
+
+    // ── สร้าง summaryDaily: รวม actual/target ต่อวันจากทุกสาขา ──
+    window._summaryDaily={};
+    allMonths.forEach(function(m){
+      const mk=m.monthIdx+'_'+m.year;
+      const dayMap={};
+      m.branches.forEach(function(b){
+        if(!b.dailyData||!b.dailyData[mk])return;
+        b.dailyData[mk].forEach(function(d){
+          if(!dayMap[d.n])dayMap[d.n]={t:0,a:0};
+          dayMap[d.n].t+=d.t;
+          dayMap[d.n].a+=d.a;
+        });
+      });
+      const dkeys=Object.keys(dayMap).map(Number).sort(function(a,b){return a-b;});
+      if(dkeys.length>0)window._summaryDaily[mk]=dkeys.map(function(n){return{n:n,t:dayMap[n].t,a:dayMap[n].a};});
+    });
+
+    renderAll();
+    setS('green','อัปเดต: '+new Date().toLocaleString('th-TH',{timeZone:'Asia/Bangkok',hour12:false}));
+  }catch(e){
+    console.error(e);setS('red','โหลดไม่ได้');
+    ['sum-load','br-load','pnl-load','alert-load'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el)el.innerHTML=`<div style="color:var(--red);line-height:2.5">⚠ ${e.message}<br><button class="btn btn-p" onclick="loadData()" style="margin-top:10px">ลองใหม่</button></div>`;
+    });
+  }
+}
+function setS(c,t){const col={green:'var(--green)',red:'var(--red)',gold:'var(--gold)'};document.getElementById('dot').style.background=col[c]||col.gold;document.getElementById('lupd').textContent=t;}
+function renderAll(){renderSummary();renderBranches();renderPnL();renderAnalysis();}
+
+function piItem(label,val,sub,cls){return`<div class="pi"><div class="pl">${label}</div><div class="pv ${cls||''}">${val}</div><div class="pd" style="color:var(--t3)">${sub}</div></div>`;}
+
+function renderSummary(){
+  hide('sum-load');show('sum-body');
+  let h='<div class="snwrap"><div class="snav" id="snav">';
+  allMonths.forEach((m,i)=>h+=`<button class="snb${i===allMonths.length-1?' on':''}" onclick="switchMon(this,'sm${i}')">${m.monthTH}${String(m.year).slice(2)}</button>`);
+  h+='</div></div>';
+  h+=`<div class="card"><div class="ct">📈 Trend ยอดขายรายเดือน</div><div class="cw-lg"><canvas id="c-trend"></canvas></div></div>`;
+
+  allMonths.forEach((m,i)=>{
+    const prev=allMonths[i-1],t=m.total,pt=prev&&prev.total;
+    const pr=proRate(m,null);
+    const achPct=t.actual&&t.target?t.actual/t.target*100:0;
+    const avgDay=totAvg(m),prevAvg=prev?totAvg(prev):null,tDayTgt=totDayTgt(m);
+    const delPct=t.actual?t.delivery/t.actual*100:0;
+    const wa=wow('actual',m,prev),wd=wow('delivery',m,prev),mDelta=momD(m,prev);
+
+    h+=`<div class="sc${i===allMonths.length-1?' on':''}" id="sm${i}">`;
+    h+=`<div class="hero"><div class="hero-l"><div class="hl">🐟 ยอดขายรวม · ${m.monthTH} ${m.year} · ${m.branches.length} สาขา${partLabel(m)}</div><div class="hv">${fmt(t.actual)}</div><div class="hs">เป้า ${fmt(t.target)} &nbsp;·&nbsp; Achievement <strong>${fmtP(achPct)}</strong> &nbsp;·&nbsp; ${dH(mDelta)} MoM(AVG/วัน) &nbsp;·&nbsp; ${dH(wa.d)} WoW</div></div>
+    <div class="hero-stats">
+      <div class="hsi"><div class="sv">${fmt(t.inStore)}</div><div class="sl">In-Store</div></div>
+      <div class="hsi"><div class="sv">${fmt(t.delivery)}</div><div class="sl">Delivery</div></div>
+      <div class="hsi"><div class="sv">${fmt(t.grab)}</div><div class="sl">Grab</div></div>
+      <div class="hsi"><div class="sv">${fmt(t.lineman)}</div><div class="sl">LINE MAN</div></div>
+      <div class="hsi"><div class="sv">${fmt(avgDay)}</div><div class="sl">AVG/วัน</div></div>
+      <div class="hsi"><div class="sv">${fmtN(t.tc)}</div><div class="sl">TC รวม</div></div>
+    </div></div>`;
+
+    h+=`<div class="prorate"><div class="prorate-title">${pr.isCur?`📅 Prorate — ผ่านมา ${pr.elapsed} วัน / ${pr.dim} วัน (เหลือ ${pr.daysLeft} วัน)`:`📅 สรุปเดือน ${m.monthTH} ${m.year}`}</div><div class="prorate-grid">`;
+    h+=piItem('เป้า Prorate ('+pr.elapsed+' วัน)',fmt(pr.pTarget),'เป้าเต็มเดือน '+fmt(t.target),'ty');
+    h+=piItem('Prorate Ach%',fmtP(pr.pAch),'ยอดจริง '+fmt(t.actual),acls(pr.pAch));
+    h+=piItem('Achievement เต็มเดือน',fmtP(pr.fullAch),'ขาด '+fmt(Math.max(0,pr.remaining)),acls(pr.fullAch));
+    h+=piItem('AVG/วัน',fmt(avgDay),'เป้า '+fmt(tDayTgt)+'/วัน',avgDay>=tDayTgt?'tg':'tr');
+    if(pr.isCur&&pr.daysLeft>0)h+=piItem('ต้องทำ/วัน ('+pr.daysLeft+' วันที่เหลือ)',fmt(pr.needed),'เพื่อถึงเป้าเต็มเดือน',pr.needed<=tDayTgt?'tg':'tr');
+    h+='</div></div>';
+
+    h+='<div class="kg">';
+    h+=kcard('Achievement',`<span class="${acls(achPct)}">${fmtP(achPct)}</span>`,'เป้า '+fmt(t.target),dH(dlt(achPct,pt&&pt.pct))+' MoM',akcls(achPct));
+    h+=kcard('Prorate Ach%',`<span class="${acls(pr.pAch)}">${fmtP(pr.pAch)}</span>`,'เป้า '+pr.elapsed+' วัน = '+fmt(pr.pTarget),pr.isCur?'เหลือ '+pr.daysLeft+' วัน':'เต็มเดือน',akcls(pr.pAch));
+    h+=kcard('AVG/วัน',`<span class="${avgDay>=tDayTgt?'tg':'tr'}">${fmt(avgDay)}</span>`,(totActDays(m)||totOpDays(m))+(totActDays(m)?' วันที่มียอดขาย':' วันทำการ')+' · เป้า '+fmt(totDayTgt(m))+'/วัน',dH(dlt(avgDay,prevAvg))+' MoM',avgDay>=tDayTgt?'cg':'cr');
+    h+=kcard('WoW ยอดรวม',`<span class="tb">${fmt(wa.we)}</span>`,'prev '+(wa.pe?fmt(wa.pe):'-'),dH(wa.d)+' WoW','cb');
+    h+=kcard('TC / TA',`<span class="ty">${fmtN(t.tc)}</span>`,'TA '+fmt(t.ta),dH(dlt(t.tc,pt&&pt.tc))+' MoM','cy');
+    h+=kcard('Delivery',`<span class="ty">${fmt(t.delivery)}</span>`,'TC '+tcF(t.tcDel)+' · TA '+taF(t.tcDel,t.taDel),dH(dlt(t.delivery,pt&&pt.delivery))+' MoM · '+dH(wd.d)+' WoW','cy');
+    h+=kcard('Grab',fmt(t.grab),'TC '+tcF(t.tcGrab)+' · TA '+taF(t.tcGrab,t.taGrab),dH(dlt(t.grab,pt&&pt.grab))+' MoM','cg');
+    h+=kcard('LINE MAN',fmt(t.lineman),'TC '+tcF(t.tcLine)+' · TA '+taF(t.tcLine,t.taLine),dH(dlt(t.lineman,pt&&pt.lineman))+' MoM','cb');
+    h+='</div>';
+
+    h+='<div class="g2">';
+    h+=`<div class="card"><div class="ct">🍩 Channel Mix — ${m.monthTH}</div><div class="cw"><canvas id="c-donut-${i}"></canvas></div></div>`;
+    h+=`<div class="card"><div class="ct">🎯 Achievement % รายสาขา</div><div class="cw"><canvas id="c-ach-${i}"></canvas></div></div>`;
+    h+='</div>';
+
+    h+=`<div class="card"><div class="ct">📋 ยอดขายรวม รายสาขา — ${m.monthTH} ${m.year} <span class="bdg bdg-y">${m.branches.length} สาขา</span></div><div class="tw"><table>`;
+    h+='<thead><tr><th class="tl">สาขา</th><th>เป้า</th><th>ยอดจริง</th><th>Ach%</th><th>เป้า Prorate</th><th>Prorate Ach%</th><th>TC</th><th>TA</th><th>AVG/วัน</th><th>MoM(AVG)</th><th>WoW</th></tr></thead><tbody>';
+    m.branches.forEach(b=>{
+      const pb=prev&&prev.branches.find(x=>x.name===b.name);
+      const bpr=proRate(m,b),bavg=brAvgFull(b);
+      const wbr=wowBr('actual',b,m,pb,prev),bpct=b.target?b.actual/b.target*100:0;
+      h+=`<tr><td class="tl">${b.name}</td><td>${fmt(b.target)}</td><td class="${acls(bpct)}"><strong>${fmt(b.actual)}</strong></td><td class="${acls(bpct)}">${fmtP(bpct)}</td><td>${fmt(bpr.pTarget)}</td><td class="${acls(bpr.pAch)}">${fmtP(bpr.pAch)}</td><td>${fmtN(b.tc)}</td><td>${fmt(b.ta)}</td><td class="${bavg>=brDayTgt(b)?'tg':'tr'}">${fmt(bavg)}</td><td>${dH(momDBr(b,m,pb,prev))}</td><td>${fmt(wbr.we)} ${dH(wbr.d)}</td></tr>`;
+    });
+    const tpct=t.pct,tavg=totAvg(m);
+    h+=`<tr class="tot"><td class="tl">รวม (${m.branches.length} สาขา)</td><td>${fmt(t.target)}</td><td class="${acls(tpct)}">${fmt(t.actual)}</td><td class="${acls(tpct)}">${fmtP(tpct)}</td><td>${fmt(pr.pTarget)}</td><td class="${acls(pr.pAch)}">${fmtP(pr.pAch)}</td><td>${fmtN(t.tc)}</td><td>${fmt(t.ta)}</td><td class="${tavg>=tDayTgt?'tg':'tr'}">${fmt(tavg)}</td><td>${dH(mDelta)}</td><td>${fmt(wa.we)} ${dH(wa.d)}</td></tr>`;
+    h+='</tbody></table></div></div>';
+
+    h+=`<div class="card"><div class="ct">📦 แยกช่องทาง — ${m.monthTH} ${m.year}</div><div class="tw"><table>`;
+    h+='<thead><tr><th class="tl">สาขา</th><th>In-Store</th><th>TC In</th><th>TA In</th><th>Delivery</th><th>TC Del</th><th>TA Del</th><th>Grab</th><th>TC Grab</th><th>TA Grab</th><th>LINE MAN</th><th>TC LINE</th><th>TA LINE</th><th>Del%</th></tr></thead><tbody>';
+    m.branches.forEach(b=>{
+      h+=`<tr><td class="tl">${b.name}</td><td>${fmt(b.inStore)}</td><td>${tcF(b.tcInStore)}</td><td>${taF(b.tcInStore,b.taInStore)}</td><td class="ty">${fmt(b.delivery)}</td><td>${tcF(b.tcDel)}</td><td>${taF(b.tcDel,b.taDel)}</td><td>${fmt(b.grab)}</td><td>${tcF(b.tcGrab)}</td><td>${taF(b.tcGrab,b.taGrab)}</td><td>${fmt(b.lineman)}</td><td>${tcF(b.tcLine)}</td><td>${taF(b.tcLine,b.taLine)}</td><td>${b.actual?fmtP(b.delivery/b.actual*100):'—'}</td></tr>`;
+    });
+    h+=`<tr class="tot"><td class="tl">รวม</td><td>${fmt(t.inStore)}</td><td>${tcF(t.tcInStore)}</td><td>${taF(t.tcInStore,t.taInStore)}</td><td class="ty">${fmt(t.delivery)}</td><td>${tcF(t.tcDel)}</td><td>${taF(t.tcDel,t.taDel)}</td><td>${fmt(t.grab)}</td><td>${tcF(t.tcGrab)}</td><td>${taF(t.tcGrab,t.taGrab)}</td><td>${fmt(t.lineman)}</td><td>${tcF(t.tcLine)}</td><td>${taF(t.tcLine,t.taLine)}</td><td>${fmtP(delPct)}</td></tr>`;
+    h+='</tbody></table></div></div>';
+
+    if(prev){
+      // ── MoM Table ──
+      h+=`<div class="card"><div class="ct">📈 MoM Comparison — ${prev.monthTH} ${prev.year} → ${m.monthTH} ${m.year}<span class="bdg" style="margin-left:6px">เทียบ AVG/วัน เพื่อความยุติธรรมระหว่างเดือน</span></div><div class="tw"><table>`;
+      h+=`<thead><tr><th class="tl">สาขา</th><th>ยอด ${prev.monthTH}</th><th>ยอด ${m.monthTH}</th><th>Δ ยอด MoM</th><th>AVG/วัน ${prev.monthTH}</th><th>AVG/วัน ${m.monthTH}</th><th>Δ AVG/วัน</th><th>TC ${prev.monthTH}</th><th>TC ${m.monthTH}</th><th>Δ TC</th><th>TA ${prev.monthTH}</th><th>TA ${m.monthTH}</th><th>Δ TA</th></tr></thead><tbody>`;
+      m.branches.forEach(b=>{
+        const pb=prev.branches.find(x=>x.name===b.name);if(!pb)return;
+        const pavg=brAvgFull(pb),cavg=brAvgFull(b);
+        h+=`<tr><td class="tl">${b.name}</td><td>${fmt(pb.actual)}</td><td>${fmt(b.actual)}</td><td>${dH(dlt(b.actual,pb.actual))}</td><td>${fmt(pavg)}</td><td>${fmt(cavg)}</td><td>${dH(dlt(cavg,pavg))}</td><td>${fmtN(pb.tc)}</td><td>${fmtN(b.tc)}</td><td>${dH(dlt(b.tc,pb.tc))}</td><td>${fmt(pb.ta)}</td><td>${fmt(b.ta)}</td><td>${dH(dlt(b.ta,pb.ta))}</td></tr>`;
+      });
+      // total row
+      const ptavg=totAvg(prev),ctavg=totAvg(m);
+      h+=`<tr class="tot"><td class="tl">รวมทุกสาขา</td><td>${fmt(prev.total.actual)}</td><td>${fmt(m.total.actual)}</td><td>${dH(dlt(m.total.actual,prev.total.actual))}</td><td>${fmt(ptavg)}</td><td>${fmt(ctavg)}</td><td>${dH(dlt(ctavg,ptavg))}</td><td>${fmtN(prev.total.tc)}</td><td>${fmtN(m.total.tc)}</td><td>${dH(dlt(m.total.tc,prev.total.tc))}</td><td>${fmt(prev.total.ta)}</td><td>${fmt(m.total.ta)}</td><td>${dH(dlt(m.total.ta,prev.total.ta))}</td></tr>`;
+      h+='</tbody></table></div></div>';
+
+      // ── WoW Table ──
+      const wl=wowLabel(m,prev);
+      h+=`<div class="card"><div class="ct">📅 WoW Comparison <span class="bdg" style="margin-left:6px">ประมาณการจาก AVG/วัน × 7</span></div>`;
+      h+=`<div style="background:rgba(72,168,208,.08);border:1px solid rgba(72,168,208,.2);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:.79rem;line-height:1.8;color:var(--t2)">`;
+      h+=`<div>🔵 <strong>ช่วงนี้ (${m.monthTH}):</strong> ${wl.curLabel}</div>`;
+      if(wl.prevLabel)h+=`<div>⚪ <strong>ช่วงก่อน (${prev.monthTH}):</strong> ${wl.prevLabel}</div>`;
+      h+=`<div style="font-size:.72rem;color:var(--t3);margin-top:4px">* WoW = ยอดจริง ÷ จำนวนวัน × 7 — หากต้องการ WoW รายสัปดาห์แม่นยำ ต้องกรอกข้อมูลรายวันใน Sheet</div>`;
+      h+='</div>';
+      h+=`<div class="tw"><table>`;
+      h+=`<thead><tr><th class="tl">สาขา</th><th>AVG/สัปดาห์<br><small style="font-weight:400;color:var(--t3)">1–${prev.days} ${prev.monthTH} ${String(prev.year).slice(2)}</small></th><th>AVG/สัปดาห์<br><small style="font-weight:400;color:var(--t3)">1–${wl.elapsed} ${m.monthTH} ${String(m.year).slice(2)}</small></th><th>Δ WoW ยอดรวม</th><th>Del (1–${prev.days} ${prev.monthTH})</th><th>Del (1–${wl.elapsed} ${m.monthTH})</th><th>Δ WoW Del</th><th>Grab (1–${prev.days} ${prev.monthTH})</th><th>Grab (1–${wl.elapsed} ${m.monthTH})</th><th>Δ WoW Grab</th><th>LINE MAN (1–${prev.days} ${prev.monthTH})</th><th>LINE MAN (1–${wl.elapsed} ${m.monthTH})</th><th>Δ WoW LINE</th></tr></thead><tbody>`;
+      m.branches.forEach(b=>{
+        const pb=prev.branches.find(x=>x.name===b.name);if(!pb)return;
+        const wa=wowBr('actual',b,m,pb,prev),wd=wowBr('delivery',b,m,pb,prev),wg=wowBr('grab',b,m,pb,prev),wl2=wowBr('lineman',b,m,pb,prev);
+        const {curLabel,prevLabel}=wowBrLabel(b,m,pb,prev);
+        h+=`<tr><td class="tl" title="${prevLabel||''} → ${curLabel}">${b.name}</td><td>${fmt(wa.pe||0)}</td><td>${fmt(wa.we)}</td><td>${dH(wa.d)}</td><td>${fmt(wd.pe||0)}</td><td>${fmt(wd.we)}</td><td>${dH(wd.d)}</td><td>${fmt(wg.pe||0)}</td><td>${fmt(wg.we)}</td><td>${dH(wg.d)}</td><td>${fmt(wl2.pe||0)}</td><td>${fmt(wl2.we)}</td><td>${dH(wl2.d)}</td></tr>`;
+      });
+      // total WoW
+      const wta=wow('actual',m,prev),wtd=wow('delivery',m,prev),wtg=wow('grab',m,prev),wtl=wow('lineman',m,prev);
+      h+=`<tr class="tot"><td class="tl">รวมทุกสาขา</td><td>${fmt(wta.pe||0)}</td><td>${fmt(wta.we)}</td><td>${dH(wta.d)}</td><td>${fmt(wtd.pe||0)}</td><td>${fmt(wtd.we)}</td><td>${dH(wtd.d)}</td><td>${fmt(wtg.pe||0)}</td><td>${fmt(wtg.we)}</td><td>${dH(wtg.d)}</td><td>${fmt(wtl.pe||0)}</td><td>${fmt(wtl.we)}</td><td>${dH(wtl.d)}</td></tr>`;
+      h+='</tbody></table></div></div>';
+    }
+    h+='<div class="g2">';
+    h+=`<div class="card"><div class="ct">📊 In-Store vs Delivery</div><div class="cw"><canvas id="c-is-${i}"></canvas></div></div>`;
+    h+=`<div class="card"><div class="ct">🚗 Grab vs LINE MAN</div><div class="cw"><canvas id="c-del-${i}"></canvas></div></div>`;
+    h+='</div>';
+    h+=`<div class="card"><div class="ct">📈 Trend รายวัน — ${m.monthTH} ${m.year} · ทุกสาขารวม</div><div class="cw-lg"><canvas id="c-dtrend-${i}"></canvas></div></div>`;
+    h+='</div>';
+  });
+
+  document.getElementById('sum-body').innerHTML=h;
+  setTimeout(()=>{
+    mkLine('c-trend',allMonths.map(m=>m.monthTH+String(m.year).slice(2)),
+      [{l:'ยอดขายรวม',d:allMonths.map(m=>m.total.actual),c:'#e0a830',fill:true},
+       {l:'เป้า',d:allMonths.map(m=>m.total.target),c:'#c07828',fill:false,dash:[6,4]},
+       {l:'Delivery',d:allMonths.map(m=>m.total.delivery),c:'#3ec870',fill:false}]);
+    allMonths.forEach((m,i)=>{
+      mkDonut('c-donut-'+i,['In-Store','Grab','LINE MAN'],[m.total.inStore,m.total.grab,m.total.lineman],['#e0a830','#3ec870','#48a8d0']);
+      const lb=m.branches.map(b=>b.name);
+      mkAchBar('c-ach-'+i,lb,m.branches.map(b=>b.target?+(b.actual/b.target*100).toFixed(1):0),m.branches.map(b=>b.target),m.branches.map(b=>b.actual));
+      mkBar('c-is-'+i,lb,[{l:'In-Store',d:m.branches.map(b=>b.inStore),c:'#e0a830'},{l:'Delivery',d:m.branches.map(b=>b.delivery),c:'#c07828'}],true);
+      mkBar('c-del-'+i,lb,[{l:'Grab',d:m.branches.map(b=>b.grab),c:'#3ec870'},{l:'LINE MAN',d:m.branches.map(b=>b.lineman),c:'#48a8d0'}],true);
+      const mk=m.monthIdx+'_'+m.year;
+      const sd=window._summaryDaily&&window._summaryDaily[mk];
+      if(sd&&sd.length>1){
+        mkLine('c-dtrend-'+i,sd.map(function(d){return d.n+'';}),
+          [{l:'ยอดจริง (รวมทุกสาขา)',d:sd.map(function(d){return d.a||null;}),c:'#e0a830',fill:true},
+           {l:'เป้า (รวมทุกสาขา)',d:sd.map(function(d){return d.t||null;}),c:'#48a8d0',fill:false,dash:[5,3]}]);
+      }
+    });
+  },0);
+}
+
+function renderBranches(){
+  hide('br-load');show('br-body');
+  const bmap=new Map();
+  allMonths.forEach(m=>m.branches.forEach(b=>{if(!bmap.has(b.name))bmap.set(b.name,[]);bmap.get(b.name).push({m,b});}));
+  const blist=[...bmap.entries()];
+  let h='<div class="snwrap"><div class="snav" id="br-tabs">';
+  blist.forEach(([name],bi)=>h+=`<button class="snb${bi===0?' on':''}" onclick="switchBr(this,'brc${bi}')">${name}</button>`);
+  h+='</div></div>';
+  blist.forEach(([name,entries],bi)=>{
+    h+=`<div class="sc${bi===0?' on':''}" id="brc${bi}"><div class="stitle">🏪 ${name}</div>`;
+    h+=`<div class="snav" id="bsub${bi}">`;
+    entries.forEach((e,mi)=>h+=`<button class="snb${mi===entries.length-1?' on':''}" onclick="switchBrMon(this,'bm${bi}_${mi}')">${e.m.monthTH}${String(e.m.year).slice(2)}</button>`);
+    h+='</div>';
+    entries.forEach((e,mi)=>{
+      const b=e.b,m=e.m,pb=entries[mi-1]&&entries[mi-1].b,pm=entries[mi-1]&&entries[mi-1].m;
+      const bpct=b.target?b.actual/b.target*100:0,avgD=brAvgFull(b),bDTgt=brDayTgt(b);
+      const bpr=proRate(m,b),wa=wowBr('actual',b,m,pb,pm),mD=momDBr(b,m,pb,pm);
+      h+=`<div class="sc${mi===entries.length-1?' on':''}" id="bm${bi}_${mi}">`;
+      h+=`<div class="hero"><div class="hero-l"><div class="hl">🏪 ${name} · ${m.monthTH} ${m.year}${partLabel(m)}</div><div class="hv">${fmt(b.actual)}</div><div class="hs">เป้า ${fmt(b.target)} &nbsp;·&nbsp; Ach <strong>${fmtP(bpct)}</strong> &nbsp;·&nbsp; ${dH(mD)} MoM(AVG) &nbsp;·&nbsp; ${dH(wa.d)} WoW</div></div>
+      <div class="hero-stats">
+        <div class="hsi"><div class="sv">${fmt(b.inStore)}</div><div class="sl">In-Store</div></div>
+        <div class="hsi"><div class="sv">${fmt(b.delivery)}</div><div class="sl">Delivery</div></div>
+        <div class="hsi"><div class="sv">${fmt(b.grab)}</div><div class="sl">Grab</div></div>
+        <div class="hsi"><div class="sv">${fmt(b.lineman)}</div><div class="sl">LINE MAN</div></div>
+        <div class="hsi"><div class="sv">${fmt(avgD)}</div><div class="sl">AVG/วัน</div></div>
+        <div class="hsi"><div class="sv">${fmtN(b.tc)}</div><div class="sl">TC</div></div>
+      </div></div>`;
+      h+=`<div class="prorate"><div class="prorate-title">${bpr.isCur?`📅 Prorate — ${bpr.elapsed} วัน / ${bpr.dim} วัน (เหลือ ${bpr.daysLeft} วัน)`:`📅 สรุปเดือน ${m.monthTH}`}</div><div class="prorate-grid">`;
+      h+=piItem('เป้า Prorate',fmt(bpr.pTarget),'เป้าเต็มเดือน '+fmt(b.target),'ty');
+      h+=piItem('Prorate Ach%',fmtP(bpr.pAch),'ยอดจริง '+fmt(b.actual),acls(bpr.pAch));
+      h+=piItem('Achievement',fmtP(bpr.fullAch),'ขาด '+fmt(Math.max(0,bpr.remaining)),acls(bpr.fullAch));
+      h+=piItem('AVG/วัน',fmt(avgD),'เป้า '+fmt(bDTgt)+'/วัน',avgD>=bDTgt?'tg':'tr');
+      if(bpr.isCur&&bpr.daysLeft>0)h+=piItem('ต้องทำ/วัน',fmt(bpr.needed),bpr.daysLeft+' วันที่เหลือ',bpr.needed<=bDTgt?'tg':'tr');
+      h+='</div></div>';
+      h+='<div class="kg">';
+      h+=kcard('Achievement',`<span class="${acls(bpct)}">${fmtP(bpct)}</span>`,'เป้า '+fmt(b.target),'',akcls(bpct));
+      h+=kcard('Prorate Ach%',`<span class="${acls(bpr.pAch)}">${fmtP(bpr.pAch)}</span>`,'เป้า Prorate = '+fmt(bpr.pTarget),'',akcls(bpr.pAch));
+      h+=kcard('AVG/วัน',`<span class="${avgD>=bDTgt?'tg':'tr'}">${fmt(avgD)}</span>`,(b.opDays||m.days)+' วันทำการ · เป้า '+fmt(brDayTgt(b))+'/วัน',dH(dlt(avgD,pb?brAvgFull(pb):null))+' MoM',avgD>=bDTgt?'cg':'cr');
+      h+=kcard('WoW',`<span class="tb">${fmt(wa.we)}</span>`,'prev '+(wa.pe?fmt(wa.pe):'-'),dH(wa.d)+' WoW','cb');
+      h+=kcard('TC / TA',`<span class="ty">${fmtN(b.tc)}</span>`,'TA '+fmt(b.ta),dH(dlt(b.tc,pb&&pb.tc))+' MoM','cy');
+      h+=kcard('In-Store',fmt(b.inStore),'TC '+tcF(b.tcInStore)+' · TA '+taF(b.tcInStore,b.taInStore),dH(dlt(b.inStore,pb&&pb.inStore))+' MoM','cp');
+      h+=kcard('Delivery',`<span class="ty">${fmt(b.delivery)}</span>`,'TC '+tcF(b.tcDel)+' · TA '+taF(b.tcDel,b.taDel),dH(dlt(b.delivery,pb&&pb.delivery))+' MoM','cy');
+      h+=kcard('Grab',fmt(b.grab),'TC '+tcF(b.tcGrab)+' · TA '+taF(b.tcGrab,b.taGrab),dH(dlt(b.grab,pb&&pb.grab))+' MoM','cg');
+      h+=kcard('LINE MAN',fmt(b.lineman),'TC '+tcF(b.tcLine)+' · TA '+taF(b.tcLine,b.taLine),dH(dlt(b.lineman,pb&&pb.lineman))+' MoM','cb');
+      h+='</div>';
+      h+='<div class="g2">';
+      h+=`<div class="card"><div class="ct">🍩 Channel Mix</div><div class="cw"><canvas id="br-d-${bi}-${mi}"></canvas></div></div>`;
+      h+=`<div class="card"><div class="ct">📊 ยอดรายช่องทาง</div><div class="cw"><canvas id="br-c-${bi}-${mi}"></canvas></div></div>`;
+      h+='</div>';
+      h+=`<div class="card"><div class="ct">📋 ยอดขายรวม — ${name} · ${m.monthTH} ${m.year}</div><div class="tw"><table>`;
+      h+='<thead><tr><th class="tl">Metric</th><th>ยอดรวม</th><th>TC</th><th>TA</th><th>In-Store</th><th>TC In</th><th>TA In</th><th>Delivery</th><th>TC Del</th><th>TA Del</th><th>Grab</th><th>TC Grab</th><th>TA Grab</th><th>LINE MAN</th><th>TC LINE</th><th>TA LINE</th></tr></thead><tbody>';
+      h+=`<tr><td class="tl">ยอดจริง (${m.monthTH})</td><td class="${acls(bpct)}"><strong>${fmt(b.actual)}</strong></td><td><strong>${fmtN(b.tc)}</strong></td><td><strong>${fmt(b.ta)}</strong></td><td>${fmt(b.inStore)}</td><td>${tcF(b.tcInStore)}</td><td>${taF(b.tcInStore,b.taInStore)}</td><td class="ty">${fmt(b.delivery)}</td><td>${tcF(b.tcDel)}</td><td>${taF(b.tcDel,b.taDel)}</td><td>${fmt(b.grab)}</td><td>${tcF(b.tcGrab)}</td><td>${taF(b.tcGrab,b.taGrab)}</td><td>${fmt(b.lineman)}</td><td>${tcF(b.tcLine)}</td><td>${taF(b.tcLine,b.taLine)}</td></tr>`;
+      h+=`<tr><td class="tl">เป้าเต็มเดือน</td><td class="ty">${fmt(b.target)}</td><td colspan="14" style="text-align:left;color:var(--t3);font-style:italic">Ach: <strong class="${acls(bpct)}">${fmtP(bpct)}</strong> · Prorate Ach: <strong class="${acls(bpr.pAch)}">${fmtP(bpr.pAch)}</strong> · AVG/วัน: <strong>${fmt(avgD)}</strong></td></tr>`;
+      if(pb){
+        h+='<tr class="shdr"><td colspan="16">เปรียบเทียบ MoM</td></tr>';
+        h+=`<tr><td class="tl">เดือนก่อน (${pm.monthTH})</td><td>${fmt(pb.actual)}</td><td>${fmtN(pb.tc)}</td><td>${fmt(pb.ta)}</td><td>${fmt(pb.inStore)}</td><td>${tcF(pb.tcInStore)}</td><td>${taF(pb.tcInStore,pb.taInStore)}</td><td>${fmt(pb.delivery)}</td><td>${tcF(pb.tcDel)}</td><td>${taF(pb.tcDel,pb.taDel)}</td><td>${fmt(pb.grab)}</td><td>${tcF(pb.tcGrab)}</td><td>${taF(pb.tcGrab,pb.taGrab)}</td><td>${fmt(pb.lineman)}</td><td>${tcF(pb.tcLine)}</td><td>${taF(pb.tcLine,pb.taLine)}</td></tr>`;
+        h+=`<tr class="tot"><td class="tl">Δ MoM (AVG/วัน)</td><td>${dH(mD)}</td><td>${dH(dlt(b.tc,pb.tc))}</td><td>${dH(dlt(b.ta,pb.ta))}</td><td>${dH(dlt(b.inStore,pb.inStore))}</td><td>${dH(dlt(b.tcInStore,pb.tcInStore))}</td><td>—</td><td>${dH(dlt(b.delivery,pb.delivery))}</td><td>${dH(dlt(b.tcDel,pb.tcDel))}</td><td>—</td><td>${dH(dlt(b.grab,pb.grab))}</td><td>${dH(dlt(b.tcGrab,pb.tcGrab))}</td><td>—</td><td>${dH(dlt(b.lineman,pb.lineman))}</td><td>${dH(dlt(b.tcLine,pb.tcLine))}</td><td>—</td></tr>`;
+      }
+      h+='</tbody></table></div></div>';
+
+      // ── WoW Table (แยกออกมาต่างหาก) ──
+      if(pb&&pm){
+        const wbl=wowBrLabel(b,m,pb,pm);
+        h+=`<div class="card"><div class="ct">📅 WoW Comparison — ${name}</div>`;
+        h+=`<div style="background:rgba(72,168,208,.08);border:1px solid rgba(72,168,208,.2);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:.79rem;line-height:1.9;color:var(--t2)">`;
+        h+=`<div>🔵 <strong>ช่วงนี้ (${m.monthTH}):</strong> ${wbl.curLabel}</div>`;
+        if(wbl.prevLabel)h+=`<div>⚪ <strong>ช่วงก่อน (${pm.monthTH}):</strong> ${wbl.prevLabel}</div>`;
+        h+=`<div style="font-size:.71rem;color:var(--t3);margin-top:3px">* ประมาณการจาก ยอดจริง ÷ จำนวนวัน × 7</div>`;
+        h+='</div>';
+        h+='<div class="tw"><table>';
+        h+=`<thead><tr><th class="tl">ช่องทาง</th><th>AVG/สัปดาห์<br><small style="font-weight:400;color:var(--t3)">1–${pm.days} ${pm.monthTH} ${String(pm.year).slice(2)}</small></th><th>AVG/สัปดาห์<br><small style="font-weight:400;color:var(--t3)">1–${wbl.elapsed} ${m.monthTH} ${String(m.year).slice(2)}</small></th><th>Δ WoW</th></tr></thead><tbody>`;
+        [['ยอดรวม','actual'],['In-Store','inStore'],['Delivery รวม','delivery'],['Grab','grab'],['LINE MAN','lineman'],['TC รวม','tc']].forEach(([label,fld])=>{
+          const wv=wowBr(fld,b,m,pb,pm);
+          h+=`<tr><td class="tl">${label}</td><td>${fmt(wv.pe||0)}</td><td>${fmt(wv.we)}</td><td>${dH(wv.d)}</td></tr>`;
+        });
+        h+='</tbody></table></div></div>';
+      }
+      // Daily trend chart สำหรับ branch นี้ เดือนนี้
+      const bmk=m.monthIdx+'_'+m.year;
+      const bdd=b.dailyData&&b.dailyData[bmk];
+      if(bdd&&bdd.length>1){
+        h+=`<div class="card"><div class="ct">📈 Trend รายวัน — ${name} · ${m.monthTH} ${m.year}</div><div class="cw-lg"><canvas id="br-dt-${bi}-${mi}"></canvas></div></div>`;
+      }
+      h+='</div>';
+    });
+    h+=`<div class="card"><div class="ct">📈 Trend รายเดือน — ${name} vs เป้า</div><div class="cw-lg"><canvas id="bt-${bi}"></canvas></div></div></div>`;
+  });
+  document.getElementById('br-body').innerHTML=h;
+  setTimeout(()=>{
+    blist.forEach(([name,entries],bi)=>{
+      mkLine('bt-'+bi,entries.map(e=>e.m.monthTH+String(e.m.year).slice(2)),
+        [{l:'ยอดจริง',d:entries.map(e=>e.b.actual),c:'#e0a830',fill:true},
+         {l:'เป้า',d:entries.map(e=>e.b.target),c:'#c07828',fill:false,dash:[6,4]},
+         {l:'In-Store',d:entries.map(e=>e.b.inStore),c:'#a07cc0',fill:false},
+         {l:'Delivery',d:entries.map(e=>e.b.delivery),c:'#3ec870',fill:false}]);
+      entries.forEach((e,mi)=>{
+        mkDonut('br-d-'+bi+'-'+mi,['In-Store','Grab','LINE MAN'],[e.b.inStore,e.b.grab,e.b.lineman],['#e0a830','#3ec870','#48a8d0']);
+        mkBar('br-c-'+bi+'-'+mi,['In-Store','Delivery','Grab','LINE MAN'],[{l:'ยอด',d:[e.b.inStore,e.b.delivery,e.b.grab,e.b.lineman],c:['#e0a830','#c07828','#3ec870','#48a8d0']}],false,true);
+        // Daily trend
+        const bmk=e.m.monthIdx+'_'+e.m.year;
+        const bdd=e.b.dailyData&&e.b.dailyData[bmk];
+        if(bdd&&bdd.length>1){
+          mkLine('br-dt-'+bi+'-'+mi,bdd.map(function(d){return d.n+'';}),
+            [{l:'ยอดจริง',d:bdd.map(function(d){return d.a||null;}),c:'#e0a830',fill:true},
+             {l:'เป้า',d:bdd.map(function(d){return d.t||null;}),c:'#48a8d0',fill:false,dash:[5,3]}]);
+        }
+      });
+    });
+  },0);
+}
+
+function renderPnL(){
+  hide('pnl-load');show('pnl-body');
+  let h='<div class="info-box">💡 P&amp;L = ยอดขาย − ค่าใช้จ่าย · Live จาก Google Sheets</div>';
+  const expMap={};expenses.forEach(e=>{if(!expMap[e.month])expMap[e.month]=[];expMap[e.month].push(e);});
+  h+='<div class="card"><div class="ct">📊 สรุป P&amp;L รายเดือน</div><div class="tw"><table>';
+  h+='<thead><tr><th class="tl">เดือน</th><th>สาขา</th><th>ยอดรวม</th><th>ค่าใช้จ่าย</th><th>Gross P&amp;L</th><th>Margin%</th><th>AVG/วัน</th><th>เป้า AVG/วัน</th><th>MoM</th></tr></thead><tbody>';
+  let prevMonth=null;
+  allMonths.forEach(function(m){
+    const t=m.total,avgDay=totAvg(m),dayTgt=totDayTgt(m);
+    const prevAvg=prevMonth?totAvg(prevMonth):null;
+    const mk=Object.keys(expMap).find(function(k){return k.toLowerCase().includes(m.monthName.toLowerCase());});
+    const totalExp=mk?expMap[mk].reduce(function(a,e){return a+e.cost;},0):0;
+    const pnl=t.actual-totalExp,margin=t.actual?pnl/t.actual*100:0;
+    h+=`<tr><td class="tl"><strong>${m.monthTH} ${m.year}</strong></td><td>${m.branches.length}</td><td class="tg"><strong>${fmt(t.actual)}</strong></td><td class="tr">${totalExp?fmtE(totalExp):'<span class="fl">—</span>'}</td><td class="${pnl>=0?'pnl-p':'pnl-n'}">${totalExp?fmtE(pnl):'—'}</td><td class="${margin>=0?'tg':'tr'}">${totalExp?fmtP(margin):'—'}</td><td class="${avgDay>=dayTgt?'tg':'tr'}">${fmt(avgDay)}</td><td class="ty">${fmt(dayTgt)}</td><td>${dH(dlt(avgDay,prevAvg))}</td></tr>`;
+    prevMonth=m;
+  });
+  h+='</tbody></table></div></div>';
+  h+='<div class="g2"><div class="card"><div class="ct">💰 Gross Profit รายเดือน</div><div class="cw-lg"><canvas id="c-pnl"></canvas></div></div>';
+  h+='<div class="card"><div class="ct">🍩 Channel Mix รวม</div><div class="cw-lg"><canvas id="c-mix"></canvas></div></div></div>';
+  const hasExp=Object.keys(expMap).length>0;
+  const ECLS=['#e0a830','#3ec870','#48a8d0','#a07cc0','#c07828','#e85858','#806830'];
+  if(!hasExp){
+    h+='<div class="warn-box">⚠ ยังไม่มีข้อมูลค่าใช้จ่ายใน Sheet — แสดงโครงสร้างตัวอย่าง (รอกรอกข้อมูลจริง)</div>';
+    const DCATS=[{cat:'วัตถุดิบ (Raw Materials)',pct:35},{cat:'ค่าแรง (Labor)',pct:25},{cat:'ค่าเช่า (Rent)',pct:15},{cat:'บรรจุภัณฑ์ (Packaging)',pct:10},{cat:'สาธารณูปโภค (Utilities)',pct:8},{cat:'การตลาด (Marketing)',pct:5},{cat:'อื่นๆ (Others)',pct:2}];
+    const DTOT=500000;
+    h+='<div class="card"><div class="ct">📊 โครงสร้างค่าใช้จ่าย <span class="bdg" style="margin-left:6px;background:rgba(232,88,88,.12);color:var(--red);border:1px solid rgba(232,88,88,.3)">ตัวอย่าง — รอข้อมูลจริง</span></div><div class="g2"><div>';
+    h+='<div class="tw"><table><thead><tr><th class="tl">หมวดค่าใช้จ่าย</th><th>%</th><th>ตัวอย่าง/เดือน</th></tr></thead><tbody>';
+    DCATS.forEach(function(c,i){h+=`<tr><td class="tl"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${ECLS[i]};margin-right:7px;vertical-align:middle"></span>${c.cat}</td><td class="ty">${c.pct}%</td><td>${fmt(DTOT*c.pct/100)}</td></tr>`;});
+    h+=`<tr class="tot"><td class="tl">รวม</td><td>100%</td><td>${fmt(DTOT)}</td></tr></tbody></table></div></div>`;
+    h+='<div><div class="cw-lg"><canvas id="c-exp-ph"></canvas></div></div></div>';
+    const DITEMS=[
+      {date:'01/06/69',detail:'แป้ง Croissant (Batch เดือน)',cat:'วัตถุดิบ',sup:'ซัพพลายเออร์ A',cost:100000},
+      {date:'01/06/69',detail:'เนย + ครีม',cat:'วัตถุดิบ',sup:'ซัพพลายเออร์ B',cost:75000},
+      {date:'05/06/69',detail:'ค่าแรงพนักงาน (เดือน)',cat:'ค่าแรง',sup:'—',cost:125000},
+      {date:'05/06/69',detail:'ค่าเช่าสาขา HomePro บางนา',cat:'ค่าเช่า',sup:'HomePro',cost:30000},
+      {date:'05/06/69',detail:'ค่าเช่าสาขา HomePro รังสิต',cat:'ค่าเช่า',sup:'HomePro',cost:27000},
+      {date:'05/06/69',detail:'ค่าเช่าสาขา อนุสาวรีย์ชัย',cat:'ค่าเช่า',sup:'—',cost:18000},
+      {date:'07/06/69',detail:'กล่อง Taiyaki + ถุง',cat:'บรรจุภัณฑ์',sup:'โรงงาน C',cost:50000},
+      {date:'10/06/69',detail:'ค่าไฟฟ้ารวม 4 สาขา',cat:'สาธารณูปโภค',sup:'MEA/PEA',cost:40000},
+      {date:'12/06/69',detail:'ค่า Boost โฆษณา',cat:'การตลาด',sup:'Meta/Google',cost:25000},
+      {date:'15/06/69',detail:'อุปกรณ์สิ้นเปลือง',cat:'อื่นๆ',sup:'—',cost:10000},
+    ];
+    h+='<div class="stitle" style="margin-top:4px">ตัวอย่างรายการค่าใช้จ่าย</div><div class="tw"><table><thead><tr><th class="tl">วันที่</th><th class="tl">รายการ</th><th class="tl">หมวด</th><th class="tl">Supplier</th><th>ค่าใช้จ่าย</th></tr></thead><tbody>';
+    DITEMS.forEach(function(e){h+=`<tr style="opacity:.65"><td class="tl">${e.date}</td><td class="tl">${e.detail}</td><td class="tl">${e.cat}</td><td class="tl">${e.sup}</td><td class="tr ty">${fmt(e.cost)}</td></tr>`;});
+    h+=`<tr class="tot"><td class="tl" colspan="4">รวม (ตัวอย่าง)</td><td>${fmt(DITEMS.reduce(function(a,d){return a+d.cost;},0))}</td></tr></tbody></table></div></div>`;
+  } else {
+    const expKeys=Object.keys(expMap);
+    // Tab navigation — ถ้ามีหลายเดือน แสดงปุ่มแบบ horizontal เหมือน summary tabs
+    if(expKeys.length>1){
+      h+='<div class="snwrap"><div class="snav" id="exp-nav">';
+      expKeys.forEach(function(month,mi){h+=`<button class="snb${mi===expKeys.length-1?' on':''}" onclick="switchExpMon(this,'expm${mi}')">${month}</button>`;});
+      h+='</div></div>';
+    }
+    expKeys.forEach(function(month,mi){
+      const isActive=expKeys.length<=1||mi===expKeys.length-1;
+      const wrapO=expKeys.length>1?`<div class="sc${isActive?' on':''}" id="expm${mi}">`:' ';
+      const wrapC=expKeys.length>1?'</div>':' ';
+      const items=expMap[month],total=items.reduce(function(a,e){return a+e.cost;},0);
+      const byCat={};items.forEach(function(e){const c=e.category||'อื่นๆ';if(!byCat[c])byCat[c]=0;byCat[c]+=e.cost;});
+      const catKeys=Object.keys(byCat).sort(function(a,b){return byCat[b]-byCat[a];});
+      const slug='e'+mi;
+      h+=wrapO;
+      h+=`<div class="card"><div class="ct">📄 ค่าใช้จ่าย — ${month} <span class="bdg bdg-y">รวม ${fmtE(total)}</span></div>`;
+      h+='<div class="stitle">แยกตามหมวด</div><div class="g2"><div>';
+      h+='<div class="tw"><table><thead><tr><th class="tl">หมวด</th><th>รวม</th><th>%</th></tr></thead><tbody>';
+      catKeys.forEach(function(cat,ci){h+=`<tr><td class="tl"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${ECLS[ci%ECLS.length]};margin-right:7px;vertical-align:middle"></span>${cat}</td><td class="ty">${fmtE(byCat[cat])}</td><td>${fmtP(byCat[cat]/total*100)}</td></tr>`;});
+      h+=`<tr class="tot"><td class="tl">รวม</td><td>${fmtE(total)}</td><td>100%</td></tr></tbody></table></div>`;
+      h+=`<div class="cw" style="margin-top:10px"><canvas id="c-exp-${slug}"></canvas></div></div>`;
+      h+='<div><div class="stitle">รายการทั้งหมด</div><div class="tw"><table><thead><tr><th class="tl">วันที่</th><th class="tl">รายการ</th><th class="tl">หมวด</th><th class="tl">Supplier</th><th>ค่าใช้จ่าย</th></tr></thead><tbody>';
+      items.forEach(function(e){h+=`<tr><td class="tl">${e.date}</td><td class="tl">${e.detail}</td><td class="tl">${e.category||'—'}</td><td class="tl">${e.supplier||'—'}</td><td class="tr">${fmtE(e.cost)}</td></tr>`;});
+      h+=`<tr class="tot"><td class="tl" colspan="4">รวม</td><td>${fmtE(total)}</td></tr></tbody></table></div></div></div></div>`;
+      h+=wrapC;
+    });
+  }
+  document.getElementById('pnl-body').innerHTML=h;
+  setTimeout(function(){
+    const now=new Date();
+    mkBar('c-pnl',allMonths.map(function(m){return m.monthTH+String(m.year).slice(2);}),
+      (function(){
+        var pData=allMonths.map(function(m){
+          var mk=Object.keys(expMap).find(function(k){return k.toLowerCase().includes(m.monthName.toLowerCase());});
+          if(!mk)return null;
+          return m.total.actual-expMap[mk].reduce(function(a,e){return a+e.cost;},0);
+        });
+        var pColors=pData.map(function(v){return v===null?'rgba(120,100,60,0.3)':v>=0?'#3ec870cc':'#e85858cc';});
+        return [{l:'Gross Profit',d:pData.map(function(v){return v===null?0:v;}),c:pColors}];
+      })(),false);
+    mkDonut('c-mix',['In-Store','Grab','LINE MAN'],
+      [allMonths.reduce(function(a,m){return a+m.total.inStore;},0),
+       allMonths.reduce(function(a,m){return a+m.total.grab;},0),
+       allMonths.reduce(function(a,m){return a+m.total.lineman;},0)],
+      ['#e0a830','#3ec870','#48a8d0']);
+    if(!hasExp)mkDonut('c-exp-ph',['วัตถุดิบ','ค่าแรง','ค่าเช่า','บรรจุภัณฑ์','สาธารณูปโภค','การตลาด','อื่นๆ'],[35,25,15,10,8,5,2],ECLS);
+    else Object.keys(expMap).forEach(function(month,mi){
+      const items=expMap[month],total=items.reduce(function(a,e){return a+e.cost;},0);
+      const byCat={};items.forEach(function(e){const c=e.category||'อื่นๆ';if(!byCat[c])byCat[c]=0;byCat[c]+=e.cost;});
+      const catKeys=Object.keys(byCat).sort(function(a,b){return byCat[b]-byCat[a];});
+      mkDonut('c-exp-e'+mi,catKeys,catKeys.map(function(c){return byCat[c];}),catKeys.map(function(_,ci){return ECLS[ci%ECLS.length];}));
+    });
+  },0);
+}
+
+function renderAnalysis(){
+  hide('alert-load');show('alert-body');
+  const latest=allMonths[allMonths.length-1],prev=allMonths[allMonths.length-2];
+  if(!latest){document.getElementById('alert-body').innerHTML='<div class="warn-box">ไม่มีข้อมูล</div>';return;}
+  const t=latest.total,pr=proRate(latest,null);
+  const achPct=t.actual&&t.target?t.actual/t.target*100:0;
+  const alerts=[],warns=[],goods=[],infos=[];
+  latest.branches.forEach(b=>{
+    const pct=b.target?b.actual/b.target*100:0,pb=prev&&prev.branches.find(x=>x.name===b.name);
+    const mom=pb?momDBr(b,latest,pb,prev):null,avgD=latest.days?b.actual/latest.days:0;
+    const bpr=proRate(latest,b),delPct=b.actual?b.delivery/b.actual*100:0;
+    if(pct<70)alerts.push({t:'🔴 '+b.name+': ยอดต่ำกว่าเป้ามาก',b:'Achievement '+fmtP(pct)+' · Prorate Ach '+fmtP(bpr.pAch)+' · ขาด '+fmt(Math.max(0,b.target-b.actual))});
+    else if(pct<100)warns.push({t:'🟡 '+b.name+': ยังไม่ถึงเป้า',b:'Achievement '+fmtP(pct)+' · ต้องทำ '+fmt(bpr.needed)+'/วัน · เหลือ '+bpr.daysLeft+' วัน'});
+    else goods.push({t:'🟢 '+b.name+': ผ่านเป้าแล้ว',b:'Achievement '+fmtP(pct)+' · ยอด '+fmt(b.actual)});
+    if(mom!==null&&mom<-15)alerts.push({t:'📉 '+b.name+': ยอด AVG/วัน ลด MoM',b:dH(mom)+' เทียบ AVG/วัน เดือนก่อน'});
+    if(mom!==null&&mom>20)goods.push({t:'📈 '+b.name+': ยอดเติบโตดี',b:dH(mom)+' AVG/วัน MoM'});
+    if(avgD<DAY_TGT*0.6)warns.push({t:'⏰ '+b.name+': AVG/วันต่ำ',b:fmt(avgD)+' vs เป้า '+fmt(DAY_TGT)+' — ลอง Flash Sale'});
+    if(delPct>60)infos.push({t:'📦 '+b.name+': Delivery สัดส่วนสูง',b:'Del '+fmtP(delPct)+' — อาจต้องกระตุ้น Walk-in'});
+  });
+  if(achPct>=100)goods.push({t:'🏆 ภาพรวม: ผ่านเป้า',b:'Achievement '+fmtP(achPct)+' · Prorate Ach '+fmtP(pr.pAch)});
+  else warns.push({t:'⚠ ภาพรวม: ยังไม่ถึงเป้า',b:'Achievement '+fmtP(achPct)+' · Prorate Ach '+fmtP(pr.pAch)+' · ขาด '+fmt(Math.max(0,t.target-t.actual))});
+  let h=`<div class="info-box">🤖 วิเคราะห์: <strong>${latest.monthTH} ${latest.year}</strong> · ${latest.branches.length} สาขา · ยอดรวม <strong>${fmt(t.actual)}</strong> · Prorate Ach <strong class="${acls(pr.pAch)}">${fmtP(pr.pAch)}</strong></div>`;
+  h+='<div class="kg">';
+  h+=kcard('🔴 ต้องแก้ด่วน',`<span class="tr">${alerts.length}</span>`,'รายการ','','cr');
+  h+=kcard('🟡 ควรระวัง',`<span class="ty">${warns.length}</span>`,'รายการ','','cy');
+  h+=kcard('🟢 ผลดี',`<span class="tg">${goods.length}</span>`,'รายการ','','cg');
+  h+=kcard('ℹ️ สังเกต',`<span class="tb">${infos.length}</span>`,'รายการ','','cb');
+  h+='</div>';
+  h+='<div class="g2"><div class="card"><div class="ct">🎯 Achievement % รายสาขา</div><div class="cw"><canvas id="c-ach-al"></canvas></div></div>';
+  h+='<div class="card"><div class="ct">📈 Trend AVG/วัน vs เป้า</div><div class="cw"><canvas id="c-avgd"></canvas></div></div></div>';
+  const rCards=(arr,cls)=>arr.forEach(a=>h+=`<div class="alcard ${cls}"><div><div class="al-t">${a.t}</div><div class="al-b">${a.b}</div></div></div>`);
+  if(alerts.length){h+='<div class="stitle">🔴 ต้องดำเนินการด่วน</div>';rCards(alerts,'danger');}
+  if(warns.length){h+='<div class="stitle">🟡 ควรติดตาม</div>';rCards(warns,'warn');}
+  if(infos.length){h+='<div class="stitle">ℹ️ ข้อสังเกต</div>';rCards(infos,'info');}
+  if(goods.length){h+='<div class="stitle">🟢 ผลลัพธ์ที่ดี</div>';rCards(goods,'good');}
+  const recs=['🎯 จัด Flash Sale / Happy Hour ดึง Walk-in','🛍️ เพิ่ม Bundle Set เพิ่ม TA (ยอดต่อคน)'];
+  const low=latest.branches.filter(b=>b.target&&b.actual/b.target<0.9);
+  if(low.length)recs.push('🏪 Focus: '+low.map(b=>b.name).join(', '));
+  recs.push('📊 กรอกข้อมูลรายวันใน Sheet เพื่อให้ WoW แม่นยำ');
+  h+='<div class="card"><div class="ct">💡 Next Steps</div>';
+  recs.forEach((r,i)=>h+=`<div style="padding:9px 2px;border-bottom:1px solid var(--border);font-size:.82rem;color:var(--t2)"><span style="color:var(--gold);font-weight:700">${i+1}.</span> ${r}</div>`);
+  h+='</div>';
+  document.getElementById('alert-body').innerHTML=h;
+  setTimeout(()=>{
+    const lb=latest.branches.map(b=>b.name);
+    const achVals=latest.branches.map(b=>b.target?+(b.actual/b.target*100).toFixed(1):0);
+    mkBar('c-ach-al',lb,[{l:'Achievement %',d:achVals,c:achVals.map(v=>v>=100?'#3ec870':v>=80?'#e0a830':'#e85858')}],false,true);
+    const bNames=[...new Set(allMonths.flatMap(m=>m.branches.map(b=>b.name)))].slice(0,5);
+    mkLine('c-avgd',allMonths.map(m=>m.monthTH+String(m.year).slice(2)),
+      bNames.map((n,ni)=>({l:n,fill:false,c:['#e0a830','#c07828','#3ec870','#48a8d0','#a07cc0'][ni],dash:[],
+        d:allMonths.map(m=>{const b=m.branches.find(x=>x.name===n);return b&&m.days?+(b.actual/m.days).toFixed(0):null;})}))
+      .concat([{l:'เป้า '+fmt(DAY_TGT)+'/วัน',d:allMonths.map(()=>DAY_TGT),c:'rgba(232,88,88,.6)',fill:false,dash:[5,4]}]));
+  },0);
+}
+
+function isMobile(){return typeof window!=='undefined'&&window.innerWidth<850;}
+function gc(){var t=document.documentElement.getAttribute('data-theme');return t==='light'?{grid:'rgba(0,0,0,.07)',tick:'#5a3808'}:{grid:'rgba(255,255,255,.07)',tick:'#c8a258'};}
+function mkBar(id,labels,datasets,stacked,indexAxis){
+  var ctx=document.getElementById(id);if(!ctx)return;if(charts[id])charts[id].destroy();var g=gc();
+  charts[id]=new Chart(ctx,{type:'bar',
+    data:{labels:labels,datasets:datasets.map(function(ds){return{label:ds.l,data:ds.d,backgroundColor:Array.isArray(ds.c)?ds.c:(ds.c.startsWith('#')?ds.c+'cc':ds.c),borderColor:'transparent',borderWidth:0,borderRadius:4};})},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{right:10}},indexAxis:indexAxis?'y':'x',
+      plugins:{legend:{position:'top',labels:{color:g.tick,font:{size:11},padding:10}},
+        tooltip:{callbacks:{label:function(c){var ax=indexAxis?'x':'y';return ' '+c.dataset.label+': ฿'+Number(c.parsed[ax]).toLocaleString('th-TH');}}}},
+      scales:{x:{stacked:stacked||false,ticks:{color:g.tick,font:{size:10}},grid:{color:g.grid}},
+              y:{position:'left',afterFit:function(scale){scale.width=Math.max(scale.width,55);},title:{display:true,text:'฿',color:g.tick,font:{size:9},padding:{bottom:2}},stacked:stacked||false,ticks:{color:g.tick,font:{size:9},maxTicksLimit:5,callback:function(v){if(!v&&v!==0)return v;if(v>=1000000)return (v/1000000).toFixed(1)+'M';if(v>=1000)return Math.round(v/1000)+'K';return v;}},grid:{color:g.grid}}}}});}
+function mkAchBar(id,labels,pcts,targets,actuals){
+  var ctx=document.getElementById(id);if(!ctx)return;if(charts[id])charts[id].destroy();var g=gc();
+  var fmtV=function(v){if(v>=1000000)return '฿'+(v/1000000).toFixed(1)+'M';if(v>=1000)return '฿'+(v/1000).toFixed(0)+'K';return '฿'+v;};
+  charts[id]=new Chart(ctx,{type:'bar',
+    data:{labels:labels,datasets:[
+      {label:'เป้า (฿)',data:targets,backgroundColor:'rgba(192,120,40,.4)',borderRadius:4},
+      {label:'ยอดจริง (฿)',data:actuals,backgroundColor:pcts.map(function(p){return p>=100?'#3ec870cc':p>=80?'#e0a830cc':'#e85858cc';}),borderRadius:4}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      layout:{padding:{right:8,top:4,bottom:0}},
+      plugins:{legend:{position:'top',labels:{color:g.tick,font:{size:10}}},
+        tooltip:{callbacks:{label:function(c){var v=c.parsed.y;var pct=pcts[c.dataIndex];var suffix=c.datasetIndex===1?' (Ach: '+pct.toFixed(1)+'%)':'';return ' '+c.dataset.label+': ฿'+Number(v).toLocaleString('th-TH')+suffix;}}}},
+      scales:{
+        x:{ticks:{color:g.tick,font:{size:9},maxRotation:30,autoSkip:true},grid:{color:g.grid}},
+        y:{
+          position:'left',
+          afterFit:function(scale){scale.width=Math.max(scale.width,55);},
+          ticks:{color:g.tick,font:{size:9},maxTicksLimit:5,callback:function(v){if(v>=1000000)return (v/1000000).toFixed(1)+'M';if(v>=1000)return Math.round(v/1000)+'K';return v;}},
+          grid:{color:g.grid}
+        }
+      }}})}
+
+function mkLine(id,labels,datasets){
+  var ctx=document.getElementById(id);if(!ctx)return;if(charts[id])charts[id].destroy();var g=gc();
+  charts[id]=new Chart(ctx,{type:'line',
+    data:{labels:labels,datasets:datasets.map(function(ds){return{label:ds.l,data:ds.d,borderColor:ds.c,backgroundColor:ds.fill?ds.c+'20':'transparent',fill:ds.fill||false,tension:0.3,pointRadius:4,pointHoverRadius:6,borderDash:ds.dash||[],spanGaps:true};})},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{color:g.tick,font:{size:12},padding:10}},
+        tooltip:{callbacks:{label:function(c){return ' '+c.dataset.label+': ฿'+Number(c.parsed.y).toLocaleString('th-TH');}}}},
+      scales:{x:{ticks:{color:g.tick,font:{size:10},maxRotation:45,autoSkip:true,autoSkipPadding:8},grid:{color:g.grid}},
+              y:{position:'left',afterFit:function(scale){scale.width=Math.max(scale.width,55);},title:{display:true,text:'฿',color:g.tick,font:{size:9},padding:{bottom:2}},ticks:{color:g.tick,font:{size:9},maxTicksLimit:5,callback:function(v){if(v>=1000000)return (v/1000000).toFixed(1)+'M';if(v>=1000)return Math.round(v/1000)+'K';return v;}},grid:{color:g.grid}}}}});}
+function mkDonut(id,labels,data,colors){
+  var ctx=document.getElementById(id);if(!ctx)return;if(charts[id])charts[id].destroy();var g=gc(),total=data.reduce(function(a,b){return a+b;},0);
+  charts[id]=new Chart(ctx,{type:'doughnut',
+    data:{labels:labels,datasets:[{data:data,backgroundColor:colors,borderColor:'transparent',borderWidth:0,hoverOffset:8}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',
+      plugins:{legend:{position:'bottom',labels:{color:g.tick,font:{size:12},padding:14}},
+        tooltip:{callbacks:{label:function(c){return '  '+c.label+': ฿'+Math.round(c.parsed).toLocaleString('th-TH')+' ('+(c.parsed/total*100).toFixed(1)+'%)';}}}}}});}
+function showTab(btn,id){document.querySelectorAll('.mnb').forEach(function(b){b.classList.remove('on');});document.querySelectorAll('.tc').forEach(function(t){t.classList.remove('on');});btn.classList.add('on');document.getElementById(id).classList.add('on');}
+function switchMon(btn,id){document.querySelectorAll('#snav .snb').forEach(function(b){b.classList.remove('on');});document.querySelectorAll('#sum-body > .sc').forEach(function(s){s.classList.remove('on');});btn.classList.add('on');var el=document.getElementById(id);if(el)el.classList.add('on');}
+function switchExpMon(btn,id){document.querySelectorAll('#exp-nav .snb').forEach(function(b){b.classList.remove('on');});document.querySelectorAll('#pnl-body > .sc').forEach(function(s){s.classList.remove('on');});btn.classList.add('on');var el=document.getElementById(id);if(el){el.classList.add('on');requestAnimationFrame(function(){window.dispatchEvent(new Event('resize'));});}}
+function switchBr(btn,id){document.querySelectorAll('#br-tabs .snb').forEach(function(b){b.classList.remove('on');});document.querySelectorAll('#br-body > .sc').forEach(function(s){s.classList.remove('on');});btn.classList.add('on');var el=document.getElementById(id);if(el)el.classList.add('on');}
+function switchBrMon(btn,id){var nav=btn.parentElement;nav.querySelectorAll('.snb').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');var brc=btn.closest('.sc');if(brc)brc.querySelectorAll(':scope > .sc').forEach(function(s){s.classList.remove('on');});var el=document.getElementById(id);if(el)el.classList.add('on');}
+function toggleTheme(){var t=document.documentElement.getAttribute('data-theme');document.documentElement.setAttribute('data-theme',t==='dark'?'light':'dark');setTimeout(function(){Object.values(charts).forEach(function(c){if(!c)return;var g=gc();['x','y','y2'].forEach(function(ax){if(c.options.scales&&c.options.scales[ax]){if(c.options.scales[ax].grid)c.options.scales[ax].grid.color=g.grid;if(c.options.scales[ax].ticks)c.options.scales[ax].ticks.color=g.tick;}});if(c.options.plugins&&c.options.plugins.legend)c.options.plugins.legend.labels.color=g.tick;c.update();});},200);}
+function hide(id){var e=document.getElementById(id);if(e)e.style.display='none';}
+function show(id){var e=document.getElementById(id);if(e)e.style.display='block';}
+
+setInterval(loadData,5*60*1000);
+loadData();
+
+</script>
+</body>
+</html>
